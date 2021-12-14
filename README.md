@@ -8,8 +8,8 @@ SIMI Motion, compared to GAITRite System Metrics
                 # filepath = r"C:\...\X9001262 - Data\10010012\X9001262_A_10010012_01_SIMIMCS1_Normal_Walk_marker_processed_7_13_2021.txt"
                 # filepath_GS = r"C:\...\X9001262 - Data\10010012\X9001262_A_10010012_01_Normal_PKMAS.csv"
                 # filepath_GS_sync = r"C:\...\X9001262 - Data\10010012\X9001262_A_10010012_01_Normal_PKMAS_sync.csv"
-        # Calculatee all SIMI vs. GS metrics and generate comparisons based on procecced SIMI and GS data.            
-        # Generates metrics for all trials and save into a "Batch_Outputs" dictionary.
+        # Calculates all SIMI vs. GS metrics and generates comparisons based on procecced SIMI and GS data.            
+        # Generates metrics for all trials and saves into a "Batch_Outputs" dictionary.
   
     # "SIMIpy_m_GUI.py" to select any one of the four trial types above, for further processing or visualization.
 
