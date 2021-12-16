@@ -1,6 +1,8 @@
 # SIMIpy_m
 SIMI Motion, compared to GAITRite System Metrics
 
+    # Pre-Requisite:
+        # Written to run on Spyder IDE (Anaconda3 environment), Python 3.8.
 
     # 1) "SIMIpy_m_main.py" to process all trials for one patricipant.
         # Required: The folder structure should contain all 4 trial types collected for that participant.
