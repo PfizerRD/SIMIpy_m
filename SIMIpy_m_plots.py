@@ -56,8 +56,10 @@ _plot_GS_stride_Velocities()
 
 def _plot_HMA():
     fig, ax = plt.subplots(1, 1, figsize=(12, 7))
+    ax.set_axisbelow(True)
+    ax.yaxis.grid(color='0.95', linestyle='dashed')
+    ax.xaxis.grid(color='0.95', linestyle='dashed')
     plt.show()
-    plt.grid(color='0.95')
 
     # Plot Heel Vertical Acceleration (Left Foot)
     plt.plot(HMA_left_foot.time_heel, HMA_left_foot.heel_accel_Z, c='g',
@@ -164,10 +166,10 @@ def _plot_FVA():
     plt.plot(SIMIvars['time'], SIMI_metrics['Spine_pos_deriv_velocity'],
              label='SIMI, Instantaneous Velocity (Spine Marker)')
     # GS First Contact Times, All Passes
-    plt.scatter(GS_calc['First_Contact_time'], GS_calc['Stride_Velocity'],
+    plt.scatter(GS_calc['First_Contact_time'], [1] * len(GS_calc['First_Contact_time']),
                 label='GS, First Contact Time', s=75, c='gold')
     # GC Last Contact Times, All Passes
-    plt.scatter(GS_calc['Last_Contact_time'], GS_calc['Stride_Velocity'],
+    plt.scatter(GS_calc['Last_Contact_time'], [1] * len(GS_calc['Last_Contact_time']),
                 label='GS, Last Contact Time', s=75, c='black')
 
     plt.title('Foot Velocity Algorithm (FVA), GS and SIMI Metrics \n Participant (#%s) \n Trial GS: (%s) \n Trial SIMI: (%s)'
@@ -201,10 +203,10 @@ def _plot_HHD():
     plt.plot(SIMIvars['time'], SIMI_metrics['Spine_pos_deriv_velocity'],
              label='SIMI, Instantaneous Velocity (Spine Marker)')
     # GS First Contact Times, All Passes
-    plt.scatter(GS_calc['First_Contact_time'], GS_calc['Stride_Velocity'],
+    plt.scatter(GS_calc['First_Contact_time'], [1] * len(GS_calc['First_Contact_time']),
                 label='GS, First Contact Time', s=75, c='gold')
     # GC Last Contact Times, All Passes
-    plt.scatter(GS_calc['Last_Contact_time'], GS_calc['Stride_Velocity'],
+    plt.scatter(GS_calc['Last_Contact_time'], [1] * len(GS_calc['Last_Contact_time']),
                 label='G,S Last Contact Time', s=75, c='black')
 
     plt.title('HHD Algorithm, GS and SIMI Velocities \n Participant (#%s) \n Trial SIMI: (%s)'
@@ -230,7 +232,7 @@ _plot_HHD()
 # # Save the figure
 # figname = ('GS_SIMI_PN%s_Trial_%s'
 #            % (Filenames['participant_num'], current_trial['GS_filename'][20:-4]))
-# figname = (Filenames['patient_dir']+'/'+figname)
+# figname = (Filenames['participant_dir']+'/'+figname)
 # plt.savefig(figname)
 
 # del figname

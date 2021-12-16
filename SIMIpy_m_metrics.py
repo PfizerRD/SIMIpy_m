@@ -219,11 +219,10 @@ GS_calc = {
 GS_calc['Step_Events'] = GS_vars.pop('Unnamed: 1')
 
 # Drop the Nans at the beginning and end of the GS_calc['Step_Events'] array
-# careful doing this, becasuethere are some NaN in the middle of some GS step data
+# careful doing this, becasue there are some NaN in the middle of some GS step data
 
 first_idx = GS_calc['Step_Events'].first_valid_index()
 last_idx = GS_calc['Step_Events'].last_valid_index()
-print('GS Steps: ', last_idx)
 GS_calc['Step_Events'] = GS_calc['Step_Events'].loc[first_idx:last_idx]
 
 del first_idx, last_idx
@@ -234,7 +233,7 @@ GS_calc['Step_Events'] = np.array(GS_calc['Step_Events'])
 # skip those rows using this skip variable that gets assigned here
 skip = int(np.where(GS_vars['Unnamed: 0'] == '1')[0])
 GS_calc['Step_Events'] = np.delete(
-    GS_calc['Step_Events'], range(0, skip), axis=0)
+    GS_calc['Step_Events'], range(0, skip-1), axis=0)
 del skip
 
 str = GS_calc['Step_Events']
@@ -242,6 +241,8 @@ str = GS_calc['Step_Events']
 GS_calc['Step_Events'] = pandas.DataFrame(GS_calc['Step_Events'])
 GS_calc['Step_Events'] = GS_calc['Step_Events'].set_axis(
     ['steps_idx'], axis=1, inplace=False)
+
+print("GS Steps: ", len(GS_calc['Step_Events']))
 
 GS_calc['Pass_1'] = []
 GS_calc['Pass_2'] = []
@@ -254,6 +255,7 @@ for n in range(0, len((GS_calc['Step_Events']))):
         GS_calc['Pass_2'].append(n)
     elif '3:' in str[n]:
         GS_calc['Pass_3'].append(n)
+
 
 # %% GS Passes
 
@@ -657,19 +659,15 @@ HMA_right = HMA()
 
 
 # Call definition for FVA peaks detection
-time_masked_heel = np.array(SIMIvars['time'][time_vars['Heel_Left_mask']])
-time_masked_toe = np.array(SIMIvars['time'][time_vars['Toe_Left_mask']])
-HMA_left_foot = _HMA_calc(time_masked_heel, time_masked_toe,
-                     SIMIvars_no_gaps['Heel_Left_a'],
-                     SIMIvars_no_gaps['Toe_Left_a'], HMA_left, h)
+HMA_left_foot = _HMA_calc(SIMIvars['Heel_Left_a'],
+                          SIMIvars['Toe_Left_a'], 
+                          time_vars['Heel_Left_mask'], HMA_left, h)
 
-time_masked_heel = np.array(SIMIvars['time'][time_vars['Heel_Right_mask']])
-time_masked_toe = np.array(SIMIvars['time'][time_vars['Toe_Right_mask']])
-HMA_right_foot = _HMA_calc(time_masked_heel, time_masked_toe,
-                      SIMIvars_no_gaps['Heel_Right_a'],
-                      SIMIvars_no_gaps['Toe_Right_a'], HMA_right, h)
+HMA_right_foot = _HMA_calc(SIMIvars['Heel_Right_a'],
+                           SIMIvars['Toe_Right_a'],
+                           time_vars['Heel_Right_mask'], HMA_right, h)
 
-del HMA_left, HMA_right, time_masked_heel, time_masked_toe
+del HMA_left, HMA_right
 
 # %% Heel to Heel Algorithm - HS, TO Detection
 

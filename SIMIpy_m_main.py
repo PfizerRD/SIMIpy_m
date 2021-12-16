@@ -13,6 +13,7 @@ from SIMIpy_m_filenames import Filenames
 from SIMIpy_m_processing_filepair import _filepair_chooser
 import SIMIpy_m_filenames
 import importlib
+import matplotlib as plt
 importlib.reload(SIMIpy_m_filenames)
 
 path = os.getcwd()
@@ -145,7 +146,7 @@ Batch_Outputs['output_metrics_spreadsheet'] = pandas.DataFrame(data=Batch_Output
                                                                         "SIMI_Velocity_Passes_mean",
                                                                         "SIMI_Spine_pos_deriv_velocity_median"])
 
-# %% EVENT METRICS SPREADSHEET
+# %% EVENT METRICS SPREADSHEET (HS)
 
 df1 = pandas.DataFrame(Batch_Outputs['FVA_vals_HS']['Normal'])
 df2 = pandas.DataFrame(Batch_Outputs['FVA_vals_HS']['Fast'])
@@ -156,49 +157,95 @@ df5 = pandas.DataFrame(Batch_Outputs['GS_HS']['Normal'])
 df6 = pandas.DataFrame(Batch_Outputs['GS_HS']['Fast'])
 df7 = pandas.DataFrame(Batch_Outputs['GS_HS']['Slow'])
 df8 = pandas.DataFrame(Batch_Outputs['GS_HS']['Carpet'])
-df = pandas.concat([df1, df2, df3, df4, df5, df6, df7, df8], ignore_index=True, axis=1)
+df = pandas.concat([df1, df2, df3, df4, df5, df6, df7, df8],
+                   ignore_index=True, axis=1)
+
+df.columns = ["FVA_HS (Normal)",
+              "FVA_HS (Fast)",
+              "FVA_HS (Slow)",
+              "FVA_HS (Carpet)",
+              "GS_HS (Normal)",
+              "GS_HS (Fast)",
+              "GS_HS (Slow)",
+              "GS_HS (Carpet)"]
 
 del df1, df2, df3, df4, df5, df6, df7, df8
 
 # create excel writer
-writer = pandas.ExcelWriter('output.xlsx')
+# figname = (Filenames['patient_dir']+'/'+figname)
+# plt.savefig(figname)
+writer = pandas.ExcelWriter(Filenames['participant_num'] +
+                            "_FVA_and_GS_Heel_Strikes.xlsx",
+                            engine="xlsxwriter")
 
 # write dataframe to excel sheet named 'marks'
-df.to_excel(writer, 'marks')
+df.to_excel(writer, sheet_name='Sheet1')
 
 # # save the excel file
 writer.save()
+writer.close()
 print('DataFrame is written successfully to Excel Sheet.')
 
 # %% Compare HS detection methods
 # Find closest matching pairs from SIMI and GS HS data
+HeelStrike_SIMI = {
+    "Normal": [],
+    "Fast": [],
+    "Slow":  [],
+    "Carpet": []
+}
+
+HeelStrike_GS = {
+    "Normal": [],
+    "Fast": [],
+    "Slow":  [],
+    "Carpet": []
+}
+
+def _matching_HS(X, Y):
+
+    z = []
+
+    if len(X) < len(Y):
+        for n in range(0, len(X)):
+            num = min(Y, key=lambda x: abs(x-X[n]))
+            if X[n] < num:
+                z.append(np.array([X[n], num]))
+    elif len(Y) < len(X):
+        for n in range(0, len(Y)):
+            num = min(X, key=lambda x: abs(x-Y[n]))
+            if Y[n] < num:
+                z.append(np.array([num, Y[n]]))
+
+    del X, Y
+
+    HeelStrike_SIMI = []
+    HeelStrike_GS = []
+
+    for n in range(0, len(z)):
+        HeelStrike_SIMI.append(z[n][0])
+        HeelStrike_GS.append(z[n][1])
+
+    HeelStrike_SIMI = np.array(HeelStrike_SIMI)
+    HeelStrike_GS = np.array(HeelStrike_GS)
+
+    return HeelStrike_SIMI, HeelStrike_GS
 
 
-X = np.array(Batch_Outputs['FVA_vals_HS']['Normal'])
-Y = np.array(Batch_Outputs['GS_HS']['Normal'])
+# Matching Heel Strike Timing
+[HeelStrike_SIMI['Normal'], HeelStrike_GS['Normal']] = _matching_HS(Batch_Outputs['FVA_vals_HS']['Normal'],
+                                                          Batch_Outputs['GS_HS']['Normal'])
+[HeelStrike_SIMI['Fast'], HeelStrike_GS['Fast']] = _matching_HS(Batch_Outputs['FVA_vals_HS']['Fast'],
+                                                          Batch_Outputs['GS_HS']['Fast'])
+[HeelStrike_SIMI['Slow'], HeelStrike_GS['Slow']] = _matching_HS(Batch_Outputs['FVA_vals_HS']['Slow'],
+                                                          Batch_Outputs['GS_HS']['Slow'])
+[HeelStrike_SIMI['Carpet'], HeelStrike_GS['Carpet']] = _matching_HS(Batch_Outputs['FVA_vals_HS']['Carpet'],
+                                                          Batch_Outputs['GS_HS']['Carpet'])
+# Save Matching HS to Spreadsheet
 
-
-z = []
-
-if len(X) < len(Y):
-    for n in range(0, len(X)):
-        num = min(Y, key=lambda x: abs(x-X[n]))
-        if X[n] < num:
-            z.append(np.array([X[n], num]))
-elif len(Y) < len(X):
-    for n in range(0, len(Y)):
-        num = min(X, key=lambda x: abs(x-Y[n]))
-        if Y[n] < num:
-            z.append(np.array([num, Y[n]]))
-
-del X, Y
-
-HeelStrike_SIMI = []
-HeelStrike_GS = []
-
-for n in range(0, len(z)):
-    HeelStrike_SIMI.append(z[n][0])
-    HeelStrike_GS.append(z[n][1])
-
-HeelStrike_SIMI = np.array(HeelStrike_SIMI)
-HeelStrike_GS = np.array(HeelStrike_GS)
+# Scatter Plot of Participant's HS from all trials
+# plt.figure()
+# plt.scatter(HeelStrike_GS['Normal'], HeelStrike_SIMI['Normal'])
+# plt.scatter(HeelStrike_GS['Fast'], HeelStrike_SIMI['Fast'])
+# plt.scatter(HeelStrike_GS['Slow'], HeelStrike_SIMI['Slow'])
+# plt.scatter(HeelStrike_GS['Carpet'], HeelStrike_SIMI['Carpet'])
