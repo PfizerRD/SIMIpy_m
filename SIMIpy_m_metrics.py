@@ -658,7 +658,7 @@ HMA_left = HMA()
 HMA_right = HMA()
 
 
-# Call definition for FVA peaks detection
+# Call definition for HMA peaks detection
 HMA_left_foot = _HMA_calc(SIMIvars['Heel_Left_a'],
                           SIMIvars['Toe_Left_a'], 
                           time_vars['Heel_Left_mask'], HMA_left, h)

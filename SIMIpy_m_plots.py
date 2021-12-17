@@ -195,7 +195,9 @@ _plot_FVA()
 def _plot_HHD():
     fig, ax = plt.subplots(1, 1, figsize=(12, 7))
     plt.show()
-    plt.grid(color='0.95')
+    ax.set_axisbelow(True)
+    ax.yaxis.grid(color='0.95', linestyle='dashed')
+    ax.xaxis.grid(color='0.95', linestyle='dashed')
 
     plt.plot(SIMIvars['time'], Heel_to_Heel[:, 1], label='Heel to Heel Distance')
 
