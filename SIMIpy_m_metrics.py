@@ -13,7 +13,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
 from scipy.signal import argrelextrema
-import math
 from SIMIpy_m_PKMAS_sync import _get_PKMAS_sync
 from SIMIpy_m_Event_Metrics import _FVA_calc, _HMA_calc, _Heel_to_Heel
 from SIMIpy_m_metrics_SIMI_passes import _SIMI_passes_velocity
@@ -263,10 +262,10 @@ GS_calc['Pass_1'] = np.array(GS_calc['Pass_1'])
 GS_calc['Pass_2'] = np.array(GS_calc['Pass_2'])
 GS_calc['Pass_3'] = np.array(GS_calc['Pass_3'])
 
-# Drop the first and last 2 steps from GS_calc Passes
-GS_calc['Pass_1'] = GS_calc['Pass_1'][2:-3]
-GS_calc['Pass_2'] = GS_calc['Pass_2'][2:-3]
-GS_calc['Pass_3'] = GS_calc['Pass_3'][2:-3]
+# Drop the first two and last two steps from GS_calc Passes [2:-2]
+GS_calc['Pass_1'] = GS_calc['Pass_1']
+GS_calc['Pass_2'] = GS_calc['Pass_2']
+GS_calc['Pass_3'] = GS_calc['Pass_3']
 
 GS_calc['Pass_1_Left'] = []
 GS_calc['Pass_1_Right'] = []
@@ -293,27 +292,43 @@ for n in range(0, len(GS_calc['Pass_3'])):
     elif 'Right' in GS_calc['Step_Events'].steps_idx[GS_calc['Pass_3'][n]]:
         GS_calc['Pass_3_Right'].append(GS_calc['Pass_3'][n])
 
-# convert to meters
+GS_calc['Left_Steps'] = np.concatenate([GS_calc['Pass_1_Left'],
+                                        GS_calc['Pass_2_Left'],
+                                        GS_calc['Pass_3_Left']])
+GS_calc['Right_Steps'] = np.concatenate([GS_calc['Pass_1_Right'],
+                                         GS_calc['Pass_2_Right'],
+                                         GS_calc['Pass_3_Right']])
+
+# Divide stride velocity by 100 to convert to m/s
 GS_calc['Midfoot_X'] = GS_vars['Foot Center X Location (cm.)'] / 100
 GS_calc['Midfoot_X'] = np.array(GS_calc['Midfoot_X'])
 GS_calc['Midfoot_X'] = np.delete(GS_calc['Midfoot_X'], range(0, 15), axis=0)
 
-GS_calc['First_Contact_time'] = GS_vars['First Contact (sec.)']
-GS_calc['First_Contact_time'] = np.array(GS_calc['First_Contact_time'])
-GS_calc['First_Contact_time'] = np.delete(
-    GS_calc['First_Contact_time'], range(0, 15), axis=0)
+GS_calc['First_Contact'] = GS_vars['First Contact (sec.)']
+GS_calc['First_Contact'] = np.array(GS_calc['First_Contact'])
+GS_calc['First_Contact'] = np.delete(
+    GS_calc['First_Contact'], range(0, 15), axis=0)
+GS_calc['First_Contact'] = pandas.DataFrame(GS_calc['First_Contact'],
+                                            columns=["Time"])
+GS_calc['First_Contact']['Side'] = [0] * len(GS_calc['First_Contact'])
+GS_calc['First_Contact']['Side'][GS_calc['Left_Steps']] = "left"
+GS_calc['First_Contact']['Side'][GS_calc['Right_Steps']] = "right"
 
-GS_calc['Last_Contact_time'] = GS_vars['Last Contact (sec.)']
-GS_calc['Last_Contact_time'] = np.array(GS_calc['Last_Contact_time'])
-GS_calc['Last_Contact_time'] = np.delete(
-    GS_calc['Last_Contact_time'], range(0, 15), axis=0)
+GS_calc['Last_Contact'] = GS_vars['Last Contact (sec.)']
+GS_calc['Last_Contact'] = np.array(GS_calc['Last_Contact'])
+GS_calc['Last_Contact'] = np.delete(
+    GS_calc['Last_Contact'], range(0, 15), axis=0)
 
 # Divide stride velocity by 100 to convert to m/s
 GS_calc['Stride_Velocity'] = GS_vars['Stride Velocity (cm./sec.)'] / 100
 GS_calc['Stride_Velocity'] = np.array(GS_calc['Stride_Velocity'])
 GS_calc['Stride_Velocity'] = np.delete(
     GS_calc['Stride_Velocity'], range(0, 15), axis=0)
-
+GS_calc['Last_Contact'] = pandas.DataFrame(GS_calc['Last_Contact'],
+                                           columns=["Time"])
+GS_calc['Last_Contact']['Side'] = [0] * len(GS_calc['Last_Contact'])
+GS_calc['Last_Contact']['Side'][GS_calc['Left_Steps']] = "left"
+GS_calc['Last_Contact']['Side'][GS_calc['Right_Steps']] = "right"
 # %% GS_calc - Mean Stride Velocity
 # GS_calc - Mean Stride Velocity (From GS Stride Velocity outputs)
 
@@ -623,12 +638,14 @@ FVA_vars = _FVA_class()
 
 # Call definition for FVA peaks detection
 [FVA_Left_Foot, FVA_vars_left] = _FVA_calc(SIMIvars_original, SIMIvars_Filtered['Midpoint_Left_Foot_v'][:, 2],
-                                           trial, time_vars['Heel_Left_mask'], ord=1)
+                                           trial, time_vars['Heel_Left_mask'], ord=1, side="left")
 [FVA_Right_Foot, FVA_vars_right] = _FVA_calc(SIMIvars_original, SIMIvars_Filtered['Midpoint_Right_Foot_v'][:, 2],
-                                             trial, time_vars['Heel_Right_mask'], ord=1)
+                                             trial, time_vars['Heel_Right_mask'], ord=1, side="right")
 
-FVA_vars.HS = np.sort(FVA_vars_left['HS_vals'].append(FVA_vars_right['HS_vals']))
-FVA_vars.TO = np.sort(FVA_vars_left['TO_vals'].append(FVA_vars_right['TO_vals']))
+FVA_vars.HS = FVA_vars_left['HS_vals'].append(FVA_vars_right['HS_vals'])
+FVA_vars.HS = FVA_vars.HS.sort_values(by="Time")
+FVA_vars.TO = FVA_vars_left['TO_vals'].append(FVA_vars_right['TO_vals'])
+FVA_vars.TO = FVA_vars.TO.sort_values(by="Time")
 
 del FVA_vars_left, FVA_vars_right
 
@@ -660,7 +677,7 @@ HMA_right = HMA()
 
 # Call definition for HMA peaks detection
 HMA_left_foot = _HMA_calc(SIMIvars['Heel_Left_a'],
-                          SIMIvars['Toe_Left_a'], 
+                          SIMIvars['Toe_Left_a'],
                           time_vars['Heel_Left_mask'], HMA_left, h)
 
 HMA_right_foot = _HMA_calc(SIMIvars['Heel_Right_a'],

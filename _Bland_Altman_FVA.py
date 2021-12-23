@@ -8,9 +8,12 @@ from sklearn.metrics import r2_score
 
 def bland_altman_plot(dataGS, dataSIMI, mycolor, trial_type):
 
+    # dataGS = np.array(dataGS[:, 0], dtype='float64')
+    # dataSIMI = np.array(dataSIMI[:, 0], dtype='float64')
+
     if trial_type == 'All':
-        dataGS = np.asarray(dataGS)
-        dataSIMI = np.asarray(dataSIMI)
+        dataGS = np.asarray(dataGS, dtype='float64')
+        dataSIMI = np.asarray(dataSIMI, dtype='float64')
         mean = np.nanmean([dataGS, dataSIMI], axis=0)
         diff = dataGS - dataSIMI          # Difference between dataGS and dataSIMI
         md = np.nanmean(diff)             # Mean of the difference
@@ -31,8 +34,8 @@ def bland_altman_plot(dataGS, dataSIMI, mycolor, trial_type):
                        fontsize=14, verticalalignment='top')
 
     if trial_type != "All":
-        dataGS = np.asarray(dataGS)
-        dataSIMI = np.asarray(dataSIMI)
+        dataGS = np.asarray(dataGS, dtype='float64')
+        dataSIMI = np.asarray(dataSIMI, dtype='float64')
         mean = np.nanmean([dataGS, dataSIMI], axis=0)
         diff = dataGS - dataSIMI          # Difference between dataGS and dataSIMI
         md = np.nanmean(diff)             # Mean of the difference
@@ -54,19 +57,19 @@ mngr = plt.get_current_fig_manager()
 mngr.window.setGeometry(300, 50, 1100, 1000)
 
 # All Trials
-bland_altman_plot(HeelStrike_GS['All'], HeelStrike_SIMI['All'], 'gray', 'All')
+bland_altman_plot(HeelStrike_GS['All'][:, 0], HeelStrike_SIMI['All'][:, 0], 'gray', 'All')
 
 # Normal Trial
-bland_altman_plot(HeelStrike_GS['Normal'], HeelStrike_SIMI['Normal'], 'green', 'Normal Pace')
+bland_altman_plot(HeelStrike_GS['Normal'][:, 0], HeelStrike_SIMI['Normal'][:, 0], 'green', 'Normal Pace')
 
 # Fast Trial
-bland_altman_plot(HeelStrike_GS['Fast'], HeelStrike_SIMI['Fast'], 'magenta', 'Fast Pace')
+bland_altman_plot(HeelStrike_GS['Fast'][:, 0], HeelStrike_SIMI['Fast'][:, 0], 'magenta', 'Fast Pace')
 
 # Slow Trial
-bland_altman_plot(HeelStrike_GS['Slow'], HeelStrike_SIMI['Slow'], 'blue', 'Slow Pace')
+bland_altman_plot(HeelStrike_GS['Slow'][:, 0], HeelStrike_SIMI['Slow'][:, 0], 'blue', 'Slow Pace')
 
 # Carpeted Trial
-bland_altman_plot(HeelStrike_GS['Carpet'], HeelStrike_SIMI['Carpet'], 'black', 'Carpeted')
+bland_altman_plot(HeelStrike_GS['Carpet'][:, 0], HeelStrike_SIMI['Carpet'][:, 0], 'black', 'Carpeted')
 
 plt.title('Bland-Altman Plot: GS HS vs SIMI HS (FVA) \n Participant (#%s)'
           % (Filenames['participant_num']), size=16)
@@ -89,19 +92,19 @@ mngr = plt.get_current_fig_manager()
 mngr.window.setGeometry(300, 50, 1100, 1000)
 
 # All Trials
-bland_altman_plot(ToeOff_GS['All'], ToeOff_SIMI['All'], 'gray', 'All')
+bland_altman_plot(ToeOff_GS['All'][:, 0], ToeOff_SIMI['All'][:, 0], 'gray', 'All')
 
 # Normal Trial
-bland_altman_plot(ToeOff_GS['Normal'], ToeOff_SIMI['Normal'], 'green', 'Normal Pace')
+bland_altman_plot(ToeOff_GS['Normal'][:, 0], ToeOff_SIMI['Normal'][:, 0], 'green', 'Normal Pace')
 
 # Fast Trial
-bland_altman_plot(ToeOff_GS['Fast'], ToeOff_SIMI['Fast'], 'magenta', 'Fast Pace')
+bland_altman_plot(ToeOff_GS['Fast'][:, 0], ToeOff_SIMI['Fast'][:, 0], 'magenta', 'Fast Pace')
 
 # Slow Trial
-bland_altman_plot(ToeOff_GS['Slow'], ToeOff_SIMI['Slow'], 'blue', 'Slow Pace')
+bland_altman_plot(ToeOff_GS['Slow'][:, 0], ToeOff_SIMI['Slow'][:, 0], 'blue', 'Slow Pace')
 
 # Carpeted Trial
-bland_altman_plot(ToeOff_GS['Carpet'], ToeOff_SIMI['Carpet'], 'black', 'Carpeted')
+bland_altman_plot(ToeOff_GS['Carpet'][:, 0], ToeOff_SIMI['Carpet'][:, 0], 'black', 'Carpeted')
 
 
 plt.title('Bland-Altman Plot: GS TO vs SIMI TO (FVA) \n Participant (#%s)'

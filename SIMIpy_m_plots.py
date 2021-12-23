@@ -13,14 +13,16 @@ import math
 
 def _plot_GS_stride_Velocities():
     fig, ax = plt.subplots(1, 1, figsize=(12, 7))
+    ax.set_axisbelow(True)
+    ax.yaxis.grid(color='0.95', linestyle='dashed')
+    ax.xaxis.grid(color='0.95', linestyle='dashed')
     plt.show()
-    plt.grid(color='0.95')
 
-    plt.scatter(GS_calc['First_Contact_time'][GS_calc['Pass_1']], GS_calc['Stride_Velocity_Pass_1'],
+    plt.scatter(GS_calc['First_Contact']['Time'][GS_calc['Pass_1']], GS_calc['Stride_Velocity_Pass_1'],
                 label='GS Stride_Velocity_Pass_1', s=75)
-    plt.scatter(GS_calc['First_Contact_time'][GS_calc['Pass_2']], GS_calc['Stride_Velocity_Pass_2'],
+    plt.scatter(GS_calc['First_Contact']['Time'][GS_calc['Pass_2']], GS_calc['Stride_Velocity_Pass_2'],
                 label='GS Stride_Velocity_Pass_2', s=75)
-    plt.scatter(GS_calc['First_Contact_time'][GS_calc['Pass_3']], GS_calc['Stride_Velocity_Pass_3'],
+    plt.scatter(GS_calc['First_Contact']['Time'][GS_calc['Pass_3']], GS_calc['Stride_Velocity_Pass_3'],
                 label='GS Stride_Velocity_Pass_3', s=75)
     plt.title('GS Stride Velocities for Three Walkway Passes', size=13)
     plt.xlabel('Time (s)')
@@ -116,10 +118,10 @@ def _plot_HMA():
     plt.title('HMA Algorithm - GS and SIMI Velocities \n Participant (#%s) \n Trial SIMI: (%s)'
               % (Filenames['participant_num'],
                  current_trial['SIMI_filename'][20:]), size=16)
-    plt.scatter(GS_calc['First_Contact_time'], GS_calc['Stride_Velocity'],
+    plt.scatter(GS_calc['First_Contact']['Time'], GS_calc['Stride_Velocity'],
                 label='GS First Contact Times', s=75, c='gold')
     # Scatter plot GS Last Contact Times of different passes
-    plt.scatter(GS_calc['Last_Contact_time'], GS_calc['Stride_Velocity'],
+    plt.scatter(GS_calc['Last_Contact']['Time'], GS_calc['Stride_Velocity'],
                 label='GS Last Contact Times', s=75, c='black')
 
     handles, labels = ax.get_legend_handles_labels()
@@ -135,7 +137,7 @@ def _plot_HMA():
 _plot_HMA()
 
 # %% Plot results of FVA
-
+ 
 
 def _plot_FVA():
     fig, ax = plt.subplots(1, 1, figsize=(12, 7))
@@ -166,10 +168,10 @@ def _plot_FVA():
     plt.plot(SIMIvars['time'], SIMI_metrics['Spine_pos_deriv_velocity'],
              label='SIMI, Instantaneous Velocity (Spine Marker)')
     # GS First Contact Times, All Passes
-    plt.scatter(GS_calc['First_Contact_time'], [1] * len(GS_calc['First_Contact_time']),
+    plt.scatter(GS_calc['First_Contact']['Time'], [1] * len(GS_calc['First_Contact']),
                 label='GS, First Contact Time', s=75, c='gold')
     # GC Last Contact Times, All Passes
-    plt.scatter(GS_calc['Last_Contact_time'], [1] * len(GS_calc['Last_Contact_time']),
+    plt.scatter(GS_calc['Last_Contact']['Time'], [1] * len(GS_calc['Last_Contact']),
                 label='GS, Last Contact Time', s=75, c='black')
 
     plt.title('Foot Velocity Algorithm (FVA), GS and SIMI Metrics \n Participant (#%s) \n Trial GS: (%s) \n Trial SIMI: (%s)'
@@ -205,10 +207,10 @@ def _plot_HHD():
     plt.plot(SIMIvars['time'], SIMI_metrics['Spine_pos_deriv_velocity'],
              label='SIMI, Instantaneous Velocity (Spine Marker)')
     # GS First Contact Times, All Passes
-    plt.scatter(GS_calc['First_Contact_time'], [1] * len(GS_calc['First_Contact_time']),
+    plt.scatter(GS_calc['First_Contact']['Time'], [1] * len(GS_calc['First_Contact']),
                 label='GS, First Contact Time', s=75, c='gold')
     # GC Last Contact Times, All Passes
-    plt.scatter(GS_calc['Last_Contact_time'], [1] * len(GS_calc['Last_Contact_time']),
+    plt.scatter(GS_calc['Last_Contact']['Time'], [1] * len(GS_calc['Last_Contact']),
                 label='G,S Last Contact Time', s=75, c='black')
 
     plt.title('HHD Algorithm, GS and SIMI Velocities \n Participant (#%s) \n Trial SIMI: (%s)'

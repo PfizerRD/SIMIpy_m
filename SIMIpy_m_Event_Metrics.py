@@ -38,7 +38,7 @@ def _butterworth_filter(Marker, time, format, dim):
 
 # %% Foot Velocity Algorithm (FVA)
 
-def _FVA_calc(variables, signal, trial, time_mask, ord):
+def _FVA_calc(variables, signal, trial, time_mask, ord, side):
 
     df = pandas.DataFrame(signal, columns=['data'])
     # Find local maxima and minima
@@ -50,6 +50,7 @@ def _FVA_calc(variables, signal, trial, time_mask, ord):
 
     df['min'] = df.iloc[argrelextrema(df.data.values, np.less_equal,
                                       order=n+ord, mode='wrap')[0]]['data']
+    df['min'] = df['min'][abs(df['min']) < 0.3]
 
     maxvals = df['TO'][~np.isnan(df['TO'])]
     minvals = df['min'][~np.isnan(df['min'])]
@@ -63,6 +64,7 @@ def _FVA_calc(variables, signal, trial, time_mask, ord):
         # Make sure there is a valley before the first peak, then proceed
         if maxvals.index[n] > minvals.index[n]:
             minvals_temp = minvals[minvals.index <= idx]
+            # if abs(maxvals.index[n] - maxvals.index[n])/100 <= 1.5: # HS must be within 1.5s of TO
             df['HS'][minvals_temp.index[-1]] = minvals_temp.iloc[-1]
 
     # Select only valleys close to zero (to match to HS)
@@ -75,9 +77,13 @@ def _FVA_calc(variables, signal, trial, time_mask, ord):
     FVA_vars = df.to_dict('series')
     FVA_vars['HS_vals'] = FVA_vars['HS'][~np.isnan(FVA_vars['HS'])]
     FVA_vars['HS_vals'] = variables['time'][FVA_vars['HS_vals'].index]
+    FVA_vars['HS_vals'] = pandas.DataFrame(FVA_vars['HS_vals'])
+    FVA_vars['HS_vals']['Side'] = side
 
     FVA_vars['TO_vals'] = FVA_vars['TO'][~np.isnan(FVA_vars['TO'])]
     FVA_vars['TO_vals'] = variables['time'][FVA_vars['TO_vals'].index]
+    FVA_vars['TO_vals'] = pandas.DataFrame(FVA_vars['TO_vals'])
+    FVA_vars['TO_vals']['Side'] = side
 
     return df, FVA_vars
 
