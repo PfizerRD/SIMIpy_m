@@ -166,7 +166,7 @@ df = pandas.concat([df1['Time'], df1['Side'],
                     df6['Time'], df6['Side'],
                     df7['Time'], df7['Side'],
                     df8['Time'], df8['Side']],
-                    ignore_index=True, axis=1)
+                   ignore_index=True, axis=1)
 
 df.columns = ["FVA_HS (Normal)", "Side (Normal)",
               "FVA_HS (Fast)", "Side (Fast)",
@@ -269,14 +269,13 @@ def _matching_HS(X, Y):
     if len(X) < len(Y):
         for n in range(0, len(X)):
             num = min(Y, key=lambda x: abs(x-X[n]))
-            z.append([SIMIvar[n], [num, GSvar[n,1]]])
+            z.append([SIMIvar[n], [num, GSvar[n, 1]]])
     elif len(Y) < len(X):
         for n in range(0, len(Y)):
             num = min(X, key=lambda x: abs(x-Y[n]))
-            z.append([[num, GSvar[n,1]], GSvar[n]])
+            z.append([[num, SIMIvar[n, 1]], GSvar[n]])
 
     del X, Y, SIMIvar, GSvar
-
 
     HeelStrike_SIMI = []
     HeelStrike_GS = []
@@ -369,14 +368,13 @@ def _matching_TO(X, Y):
     if len(X) < len(Y):
         for n in range(0, len(X)):
             num = min(Y, key=lambda x: abs(x-X[n]))
-            z.append([SIMIvar[n], [num, GSvar[n,1]]])
+            z.append([SIMIvar[n], [num, GSvar[n, 1]]])
     elif len(Y) < len(X):
         for n in range(0, len(Y)):
             num = min(X, key=lambda x: abs(x-Y[n]))
-            z.append([[num, GSvar[n,1]], GSvar[n]])
+            z.append([[num, GSvar[n, 1]], GSvar[n]])
 
     del X, Y, SIMIvar, GSvar
-
 
     ToeOff_SIMI = []
     ToeOff_GS = []
