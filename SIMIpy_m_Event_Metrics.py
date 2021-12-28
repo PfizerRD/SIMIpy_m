@@ -38,50 +38,50 @@ def _butterworth_filter(Marker, time, format, dim):
 
 # %% Foot Velocity Algorithm (FVA)
 
-def _FVA_calc(variables, signal, trial, time_mask, ord, side):
+def _FVA_calc(variables, signal, trial, time_mask, _ord, side):
 
     df = pandas.DataFrame(signal, columns=['data'])
     # Find local maxima and minima
     n = 5  # number of points to be checked before and after
     # Find local peaks
     df['max'] = df.iloc[argrelextrema(df.data.values, np.greater_equal,
-                                      order=n+ord, mode='wrap')[0]]['data']
+                                      order=n+_ord, mode='wrap')[0]]['data']
     df['TO'] = df['max'][df['max'] > 0.35]
 
-    df['min'] = df.iloc[argrelextrema(df.data.values, np.less_equal,
-                                      order=n+ord, mode='wrap')[0]]['data']
-    df['min'] = df['min'][abs(df['min']) < 0.3]
-
-    maxvals = df['TO'][~np.isnan(df['TO'])]
-    minvals = df['min'][~np.isnan(df['min'])]
+    # Select only valleys close to zero (to match to HS)
+    df['HS_temp'] = df['max'][abs(df['max']) < 0.35]
     df['HS'] = np.nan
 
-    # the following for loop will pick out the last valley before each TO,
-    # and record that valley as a HS event
-    for n in range(0, len(maxvals)):
-        idx = maxvals.index[n]
+    HSvals = df['HS_temp'][~np.isnan(df['HS_temp'])]
+    TOvals = df['TO'][~np.isnan(df['TO'])]
+    # the following loop will select the first peak after each TO,
+    # and record that peak as a HS event
 
-        # Make sure there is a valley before the first peak, then proceed
-        if maxvals.index[n] > minvals.index[n]:
-            minvals_temp = minvals[minvals.index <= idx]
+    # HS must have TO that precedes, otherwise no HS registered
+    _events = min([len(HSvals), len(TOvals)])
+
+    for n in range(0, _events-2):
+
+        idx_TO = TOvals.index[n]
+        HSvals_remaining = HSvals[HSvals.index > idx_TO]
+
+        if idx_TO < HSvals_remaining.index[-1]:
+            # Identify peak immediately following TO (should be close to zero vZ)
             # if abs(maxvals.index[n] - maxvals.index[n])/100 <= 1.5: # HS must be within 1.5s of TO
-            df['HS'][minvals_temp.index[-1]] = minvals_temp.iloc[-1]
-
-    # Select only valleys close to zero (to match to HS)
-    # df['min'] = df['min'][abs(df['min']) < 0.1]
-
-    time_masked = variables['time'][time_mask]
+            df['HS'][HSvals_remaining.index[0]] = HSvals_remaining.iloc[0]
 
     df['time'] = variables['time']
 
     FVA_vars = df.to_dict('series')
     FVA_vars['HS_vals'] = FVA_vars['HS'][~np.isnan(FVA_vars['HS'])]
     FVA_vars['HS_vals'] = variables['time'][FVA_vars['HS_vals'].index]
+    FVA_vars['HS_vals'] = np.round(FVA_vars['HS_vals'], 2)
     FVA_vars['HS_vals'] = pandas.DataFrame(FVA_vars['HS_vals'])
     FVA_vars['HS_vals']['Side'] = side
 
     FVA_vars['TO_vals'] = FVA_vars['TO'][~np.isnan(FVA_vars['TO'])]
     FVA_vars['TO_vals'] = variables['time'][FVA_vars['TO_vals'].index]
+    FVA_vars['TO_vals'] = np.round(FVA_vars['TO_vals'], 2)
     FVA_vars['TO_vals'] = pandas.DataFrame(FVA_vars['TO_vals'])
     FVA_vars['TO_vals']['Side'] = side
 
@@ -93,17 +93,17 @@ def _FVA_calc(variables, signal, trial, time_mask, ord, side):
 # Dictionary Definition
 def _HMA_calc(heel_accel, toe_accel, time_mask_heel, HMA, h):
 
-    def _peaks_HMA(signal, format, ord):
+    def _peaks_HMA(signal, format, _ord):
 
         if format == 'np':
             df = pandas.DataFrame(signal, columns=['data'])
             # Find local maxima and minima
-            # ord is number of points to be checked before and after
+            # _ord is number of points to be checked before and after
             # Find local peaks
             df['min'] = df.iloc[argrelextrema(df.data.values, np.less_equal,
-                                              order=ord, mode='clip')[0]]['data']
+                                              order=_ord, mode='clip')[0]]['data']
             df['max'] = df.iloc[argrelextrema(df.data.values, np.greater_equal,
-                                              order=ord, mode='clip')[0]]['data']
+                                              order=_ord, mode='clip')[0]]['data']
             df['max'] = df['max'][df['max'] > 0.5]
 
         return df
@@ -141,7 +141,7 @@ def _HMA_calc(heel_accel, toe_accel, time_mask_heel, HMA, h):
     HMA.toe_jerk_horiz[~time_mask_heel] = np.NaN
 
     # HMA HS events (peaks detection)
-    HMA.heel_accel_Z_peaks = _peaks_HMA(np.array(HMA.heel_accel_Z), format='np', ord=20)
+    HMA.heel_accel_Z_peaks = _peaks_HMA(np.array(HMA.heel_accel_Z), format='np', _ord=20)
     maxvals = HMA.heel_accel_Z_peaks['max'][~np.isnan(HMA.heel_accel_Z_peaks['max'])]
     HMA.HS = maxvals
     HMA.HS.time = HMA.time_heel[HMA.HS.index]
@@ -149,20 +149,20 @@ def _HMA_calc(heel_accel, toe_accel, time_mask_heel, HMA, h):
     del maxvals
 
     # HMA TO events (peaks detection)
-    HMA.accel_horiz_peaks = _peaks_HMA(np.array(HMA.accel_horiz), format='np', ord=60)
+    HMA.accel_horiz_peaks = _peaks_HMA(np.array(HMA.accel_horiz), format='np', _ord=60)
     maxvals = HMA.accel_horiz_peaks['max'][~np.isnan(HMA.accel_horiz_peaks['max'])]
     HMA.TO = maxvals
     HMA.TO.time = HMA.time_toe[HMA.TO.index]
 
     # Heel jerk (vertical) (peaks detection)
-    HMA.heel_jerk_Z_peaks = _peaks_HMA(np.array(HMA.heel_jerk_Z), format='np', ord=20)
+    HMA.heel_jerk_Z_peaks = _peaks_HMA(np.array(HMA.heel_jerk_Z), format='np', _ord=20)
     maxvals = HMA.heel_jerk_Z_peaks['max'][~np.isnan(HMA.heel_jerk_Z_peaks['max'])]
     HMA.heel_jerk_Z_peaks = maxvals
     HMA.heel_jerk_Z_peaks = HMA.time_heel[HMA.heel_jerk_Z_peaks.index]
 
     # # (Testing) - Modified HMA - TO event = peak of vertical jerk of toe marker
     # HMA TO events
-    # HMA.toe_jerk_peaks = _peaks_HMA(np.array(HMA.toe_jerk_Z), format='np', ord=1)
+    # HMA.toe_jerk_peaks = _peaks_HMA(np.array(HMA.toe_jerk_Z), format='np', _ord=1)
     # maxvals = HMA.toe_jerk_peaks['max'][~np.isnan(HMA.toe_jerk_peaks['max'])]
     # HMA.TO = maxvals
     # HMA.TO.time = HMA.time_toe[HMA.TO.index]
@@ -177,17 +177,17 @@ def _HMA_calc(heel_accel, toe_accel, time_mask_heel, HMA, h):
 
 def _Heel_to_Heel(variables, h):
 
-    def _peaks_Heel_to_Heel(signal, format, ord):
+    def _peaks_Heel_to_Heel(signal, format, _ord):
 
         if format == 'np':
             df = pandas.DataFrame(signal, columns=['data'])
             # Find local maxima and minima
-            # ord is number of points to be checked before and after
+            # _ord is number of points to be checked before and after
             # Find local peaks
             df['min'] = df.iloc[argrelextrema(df.data.values, np.less_equal,
-                                              order=ord, mode='clip')[0]]['data']
+                                              order=_ord, mode='clip')[0]]['data']
             df['max'] = df.iloc[argrelextrema(df.data.values, np.greater_equal,
-                                              order=ord, mode='clip')[0]]['data']
+                                              order=_ord, mode='clip')[0]]['data']
             df['max'] = df['max'][df['max'] > 5]
 
         return df

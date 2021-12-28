@@ -137,7 +137,7 @@ def _plot_HMA():
 _plot_HMA()
 
 # %% Plot results of FVA
- 
+
 
 def _plot_FVA():
     fig, ax = plt.subplots(1, 1, figsize=(12, 7))
@@ -157,10 +157,23 @@ def _plot_FVA():
     # FVA Right Foot Peaks
     plt.scatter(FVA_Right_Foot['time'], FVA_Right_Foot['TO'],
                 s=75, c='g')
+    plt.scatter(np.array(ToeOff_SIMI[trial.get()][:, 0], dtype='float64'), [0.9] * len(ToeOff_SIMI[trial.get()]),
+                s=75, c='g')
     plt.scatter(FVA_Right_Foot['time'], FVA_Right_Foot['HS'],
                 s=75, c='r')
+    plt.scatter(np.array(HeelStrike_SIMI[trial.get()][:, 0], dtype='float64'), [0.9] * len(HeelStrike_SIMI[trial.get()]),
+                s=75, c='r')
+
     plt.plot(FVA_Right_Foot['time'], FVA_Right_Foot['data'],
              label='SIMI, Right Midfoot Vertical Velocity')
+
+    # Annotate plot to show which foot (SIMI TO)
+    for n in range(0, len(ToeOff_SIMI[trial.get()])):
+        plt.annotate(ToeOff_SIMI[trial.get()][:, 1][n] + "_TO", (float(ToeOff_SIMI[trial.get()][:, 0][n]), 0.7), rotation=90)
+
+    # Annotate plot to show which foot (SIMI HS)
+    for n in range(0, len(HeelStrike_SIMI[trial.get()])):
+        plt.annotate(HeelStrike_SIMI[trial.get()][:, 1][n] + "_HS", (float(HeelStrike_SIMI[trial.get()][:, 0][n]), 0.7), rotation=90)
 
     # plt.plot(SIMIvars['time'], Heel_to_Heel[:, 1], label='Heel to Heel Distance')
 
@@ -170,9 +183,18 @@ def _plot_FVA():
     # GS First Contact Times, All Passes
     plt.scatter(GS_calc['First_Contact']['Time'], [1] * len(GS_calc['First_Contact']),
                 label='GS, First Contact Time', s=75, c='gold')
+
     # GC Last Contact Times, All Passes
     plt.scatter(GS_calc['Last_Contact']['Time'], [1] * len(GS_calc['Last_Contact']),
                 label='GS, Last Contact Time', s=75, c='black')
+
+    # Annotate plot to show which foot (GS TO)
+    for n in range(0, len(GS_calc['Last_Contact'])):
+        plt.annotate(GS_calc['Last_Contact']['Side'][n] + "_TO_GS", (GS_calc['Last_Contact']['Time'][n], 1.1), rotation=90)
+
+    # Annotate plot to show which foot (GS HS)
+    for n in range(0, len(GS_calc['First_Contact'])):
+        plt.annotate(GS_calc['First_Contact']['Side'][n] + "_HS_GS", (GS_calc['First_Contact']['Time'][n], 1.1), rotation=90)
 
     plt.title('Foot Velocity Algorithm (FVA), GS and SIMI Metrics \n Participant (#%s) \n Trial GS: (%s) \n Trial SIMI: (%s)'
               % (Filenames['participant_num'], current_trial['GS_filename'][20:],

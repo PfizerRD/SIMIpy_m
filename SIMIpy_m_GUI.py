@@ -1,4 +1,5 @@
 from tkinter import *
+import tkinter as tk
 
 OPTIONS = [
     "Select Individual Trial",
@@ -17,6 +18,7 @@ trials_dropdown = StringVar(root)
 trials_dropdown.set(OPTIONS[0])   # default value
 
 filepairs = Variable(root)
+trial = StringVar(root)
 
 w = OptionMenu(root, trials_dropdown, *OPTIONS)
 w.pack()
@@ -29,15 +31,19 @@ def ok():
 
     if trials_dropdown.get() == 'Normal':
         filepairs.set(Processing_filepairs[0])
+        trial.set('Normal')
 
     elif trials_dropdown.get() == 'Fast':
         filepairs.set(Processing_filepairs[1])
+        trial.set('Fast')
 
     elif trials_dropdown.get() == 'Slow':
         filepairs.set(Processing_filepairs[2])
+        trial.set('Slow')
 
     elif trials_dropdown.get() == 'Carpet':
         filepairs.set(Processing_filepairs[3])
+        trial.set('Carpet')
 
 
 def all_commands(): return [ok(), root.quit(), root.destroy()]

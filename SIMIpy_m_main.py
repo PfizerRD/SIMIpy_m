@@ -1,4 +1,4 @@
-# SIMI Motion Gait Metrics (SIMIpy-m)
+# SIMI Motion Gait Metrics (SIMIpy_m)
 # DMTI PfIRe Lab
 # Authors: Visar Berki, Hao Zhang
 
@@ -7,11 +7,9 @@
 import os
 import pandas
 import numpy as np
-# from SIMIpy_m_filenames import Filenames
 from SIMIpy_m_processing_filepair import _filepair_chooser
 import SIMIpy_m_filenames
 import importlib
-import matplotlib as plt
 importlib.reload(SIMIpy_m_filenames)
 
 path = os.getcwd()
@@ -224,103 +222,10 @@ df.columns = ["FVA_TO (Normal)", "Side (Normal)",
               "GS_TO (Carpet)", "Side (Carpet)"]
 
 del df1, df2, df3, df4, df5, df6, df7, df8
-# create excel writer
-
-# writer = pandas.ExcelWriter(Filenames['participant_num'] +
-#                             "_FVA_and_GS_Toe_Off.xlsx",
-#                             engine="xlsxwriter")
-
-# write dataframe to excel sheet named 'marks'
-# df.to_excel(writer, sheet_name='Sheet1')
-
-# # save the excel file
-# writer.save()
-# writer.close()
-# print('Toe Off DataFrame is written successfully to Excel Sheet.')
-
-# %% Compare HS detection methods
-# Find closest matching pairs from SIMI and GS HS data
-HeelStrike_SIMI = {
-    "Normal": [],
-    "Fast": [],
-    "Slow":  [],
-    "Carpet": [],
-    "All": []
-}
-
-HeelStrike_GS = {
-    "Normal": [],
-    "Fast": [],
-    "Slow":  [],
-    "Carpet": [],
-    "All": []
-}
 
 
-def _matching_HS(X, Y):
-
-    SIMIvar = np.array(X)
-    GSvar = np.array(Y)
-    X = np.array(X)[:, 0]
-    Y = np.array(Y)[:, 0]
-
-    z = []
-
-    if len(X) < len(Y):
-        for n in range(0, len(X)):
-            num = min(Y, key=lambda x: abs(x-X[n]))
-            z.append([SIMIvar[n], [num, GSvar[n, 1]]])
-    elif len(Y) < len(X):
-        for n in range(0, len(Y)):
-            num = min(X, key=lambda x: abs(x-Y[n]))
-            z.append([[num, SIMIvar[n, 1]], GSvar[n]])
-
-    del X, Y, SIMIvar, GSvar
-
-    HeelStrike_SIMI = []
-    HeelStrike_GS = []
-
-    for n in range(0, len(z)):
-        HeelStrike_SIMI.append(z[n][0])
-        HeelStrike_GS.append(z[n][1])
-
-    HeelStrike_SIMI = np.array(HeelStrike_SIMI)
-    HeelStrike_GS = np.array(HeelStrike_GS)
-
-    return HeelStrike_SIMI, HeelStrike_GS
-
-
-# Matching Heel Strike Timing
-[HeelStrike_SIMI['Normal'], HeelStrike_GS['Normal']] = _matching_HS(Batch_Outputs['FVA_vals_HS']['Normal'],
-                                                                    Batch_Outputs['GS_HS']['Normal'])
-[HeelStrike_SIMI['Fast'], HeelStrike_GS['Fast']] = _matching_HS(Batch_Outputs['FVA_vals_HS']['Fast'],
-                                                                Batch_Outputs['GS_HS']['Fast'])
-[HeelStrike_SIMI['Slow'], HeelStrike_GS['Slow']] = _matching_HS(Batch_Outputs['FVA_vals_HS']['Slow'],
-                                                                Batch_Outputs['GS_HS']['Slow'])
-[HeelStrike_SIMI['Carpet'], HeelStrike_GS['Carpet']] = _matching_HS(Batch_Outputs['FVA_vals_HS']['Carpet'],
-                                                                    Batch_Outputs['GS_HS']['Carpet'])
-
-HeelStrike_SIMI['All'] = np.concatenate([HeelStrike_SIMI['Normal'],
-                                        HeelStrike_SIMI['Fast'],
-                                        HeelStrike_SIMI['Slow'],
-                                        HeelStrike_SIMI['Carpet']])
-
-HeelStrike_GS['All'] = np.concatenate([HeelStrike_GS['Normal'],
-                                      HeelStrike_GS['Fast'],
-                                      HeelStrike_GS['Slow'],
-                                      HeelStrike_GS['Carpet']])
-
-# Save Matching HS to Spreadsheet
-
-# Scatter Plot of Participant's HS from all trials
-# plt.figure()
-# plt.scatter(HeelStrike_GS['Normal'], HeelStrike_SIMI['Normal'])
-# plt.scatter(HeelStrike_GS['Fast'], HeelStrike_SIMI['Fast'])
-# plt.scatter(HeelStrike_GS['Slow'], HeelStrike_SIMI['Slow'])
-# plt.scatter(HeelStrike_GS['Carpet'], HeelStrike_SIMI['Carpet'])
-
-# %% Compare TO detection methods
-# Find closest matching pairs from SIMI and GS TO data
+# %% Compare HS and TO detection methods
+# Find closest matching pairs from SIMI and GS HS and TO data
 
 ToeOff_SIMI = {
     "Normal": [],
@@ -338,66 +243,71 @@ ToeOff_GS = {
     "All": []
 }
 
+HeelStrike_SIMI = {
+    "Normal": [],
+    "Fast": [],
+    "Slow":  [],
+    "Carpet": [],
+    "All": []
+}
 
-def _matching_TO(X, Y):
+HeelStrike_GS = {
+    "Normal": [],
+    "Fast": [],
+    "Slow":  [],
+    "Carpet": [],
+    "All": []
+}
 
-    # X = np.array(X)
-    # Y = np.array(Y)
-    # z = []
 
-    # if len(X) < len(Y):
-    #     for n in range(0, len(X)):
-    #         num = min(Y[:,0], key=lambda x: abs(x-X[:,0][n]))
-    #         if X[:,0][n] < num:
-    #             z.append([X[n], num])
-    # elif len(Y) < len(X):
-    #     for n in range(0, len(Y)):
-    #         num = min(X[:,0], key=lambda x: abs(x-Y[:,0][n]))
-    #         if Y[:,0][n] < num:
-    #             z.append([num, Y[n]])
-
-    # del X, Y
+def _matching_Event(X, Y):
 
     SIMIvar = np.array(X)
     GSvar = np.array(Y)
     X = np.array(X)[:, 0]
     Y = np.array(Y)[:, 0]
 
-    z = []
+    match = []
 
     if len(X) < len(Y):
         for n in range(0, len(X)):
             num = min(Y, key=lambda x: abs(x-X[n]))
-            z.append([SIMIvar[n], [num, GSvar[n, 1]]])
+            num = float(num)
+            num_idx = int(np.array(np.where(Y == num)))
+            num_label = str(GSvar[num_idx, 1])
+            match.append([SIMIvar[n, 0], str(SIMIvar[n, 1]), num, num_label])
     elif len(Y) < len(X):
         for n in range(0, len(Y)):
             num = min(X, key=lambda x: abs(x-Y[n]))
-            z.append([[num, GSvar[n, 1]], GSvar[n]])
+            num = float(num)
+            num_idx = int(np.array(np.where(X == num)))
+            num_label = str(SIMIvar[num_idx, 1])
+            match.append([num, num_label, GSvar[n, 0], str(GSvar[n, 1])])
 
     del X, Y, SIMIvar, GSvar
 
-    ToeOff_SIMI = []
-    ToeOff_GS = []
+    Event_SIMI = []
+    Event_GS = []
 
-    for n in range(0, len(z)):
-        ToeOff_SIMI.append(z[n][0])
-        ToeOff_GS.append(z[n][1])
+    for n in range(0, len(match)):
+        Event_SIMI.append([match[n][0], match[n][1]])
+        Event_GS.append([match[n][2], match[n][3]])
 
-    ToeOff_SIMI = np.array(ToeOff_SIMI)
-    ToeOff_GS = np.array(ToeOff_GS)
+    Event_SIMI = np.array(Event_SIMI)
+    Event_GS = np.array(Event_GS)
 
-    return ToeOff_SIMI, ToeOff_GS
+    return Event_SIMI, Event_GS
 
 
 # Matching Toe Off Timing
-[ToeOff_SIMI['Normal'], ToeOff_GS['Normal']] = _matching_TO(Batch_Outputs['FVA_vals_TO']['Normal'],
-                                                            Batch_Outputs['GS_TO']['Normal'])
-[ToeOff_SIMI['Fast'], ToeOff_GS['Fast']] = _matching_TO(Batch_Outputs['FVA_vals_TO']['Fast'],
-                                                        Batch_Outputs['GS_TO']['Fast'])
-[ToeOff_SIMI['Slow'], ToeOff_GS['Slow']] = _matching_TO(Batch_Outputs['FVA_vals_TO']['Slow'],
-                                                        Batch_Outputs['GS_TO']['Slow'])
-[ToeOff_SIMI['Carpet'], ToeOff_GS['Carpet']] = _matching_TO(Batch_Outputs['FVA_vals_TO']['Carpet'],
-                                                            Batch_Outputs['GS_TO']['Carpet'])
+[ToeOff_SIMI['Normal'], ToeOff_GS['Normal']] = _matching_Event(Batch_Outputs['FVA_vals_TO']['Normal'],
+                                                               Batch_Outputs['GS_TO']['Normal'])
+[ToeOff_SIMI['Fast'], ToeOff_GS['Fast']] = _matching_Event(Batch_Outputs['FVA_vals_TO']['Fast'],
+                                                           Batch_Outputs['GS_TO']['Fast'])
+[ToeOff_SIMI['Slow'], ToeOff_GS['Slow']] = _matching_Event(Batch_Outputs['FVA_vals_TO']['Slow'],
+                                                           Batch_Outputs['GS_TO']['Slow'])
+[ToeOff_SIMI['Carpet'], ToeOff_GS['Carpet']] = _matching_Event(Batch_Outputs['FVA_vals_TO']['Carpet'],
+                                                               Batch_Outputs['GS_TO']['Carpet'])
 
 ToeOff_SIMI['All'] = np.concatenate([ToeOff_SIMI['Normal'],
                                      ToeOff_SIMI['Fast'],
@@ -408,6 +318,40 @@ ToeOff_GS['All'] = np.concatenate([ToeOff_GS['Normal'],
                                    ToeOff_GS['Fast'],
                                    ToeOff_GS['Slow'],
                                    ToeOff_GS['Carpet']])
+
+# Matching Heel Strike Timing
+[HeelStrike_SIMI['Normal'], HeelStrike_GS['Normal']] = _matching_Event(Batch_Outputs['FVA_vals_HS']['Normal'],
+                                                                       Batch_Outputs['GS_HS']['Normal'])
+[HeelStrike_SIMI['Fast'], HeelStrike_GS['Fast']] = _matching_Event(Batch_Outputs['FVA_vals_HS']['Fast'],
+                                                                   Batch_Outputs['GS_HS']['Fast'])
+[HeelStrike_SIMI['Slow'], HeelStrike_GS['Slow']] = _matching_Event(Batch_Outputs['FVA_vals_HS']['Slow'],
+                                                                   Batch_Outputs['GS_HS']['Slow'])
+[HeelStrike_SIMI['Carpet'], HeelStrike_GS['Carpet']] = _matching_Event(Batch_Outputs['FVA_vals_HS']['Carpet'],
+                                                                       Batch_Outputs['GS_HS']['Carpet'])
+
+HeelStrike_SIMI['All'] = np.concatenate([HeelStrike_SIMI['Normal'],
+                                        HeelStrike_SIMI['Fast'],
+                                        HeelStrike_SIMI['Slow'],
+                                        HeelStrike_SIMI['Carpet']])
+
+HeelStrike_GS['All'] = np.concatenate([HeelStrike_GS['Normal'],
+                                      HeelStrike_GS['Fast'],
+                                      HeelStrike_GS['Slow'],
+                                      HeelStrike_GS['Carpet']])
+
+# create excel writer
+
+# writer = pandas.ExcelWriter(Filenames['participant_num'] +
+#                             "_FVA_and_GS_Toe_Off.xlsx",
+#                             engine="xlsxwriter")
+
+# write dataframe to excel sheet named 'marks'
+# df.to_excel(writer, sheet_name='Sheet1')
+
+# # save the excel file
+# writer.save()
+# writer.close()
+# print('Toe Off DataFrame is written successfully to Excel Sheet.')
 
 # %% Compile all FVA and GS HS and TO
 # Results compiled into one dictionary that contains all participants and all trials
