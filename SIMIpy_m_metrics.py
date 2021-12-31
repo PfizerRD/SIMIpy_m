@@ -723,7 +723,9 @@ def _metrics(filepath, filepath_GS, filepath_GS_sync, trial):
 
     SIMI_metrics = _SIMI_passes_velocity(SIMIvars, SIMI_metrics)
 
-    return(SIMI_metrics, GS_calc, GS_PKMAS_sync, FVA_vars)
+    return(SIMI_metrics, GS_calc, GS_PKMAS_sync,
+           FVA_vars, FVA_Left_Foot, FVA_Right_Foot,
+           GS_calc, SIMIvars, current_trial)
 
 
 # %% Saving a Figure

@@ -20,10 +20,15 @@ print(path)
 
 Filenames = {}
 
+# pointing Filenames['participant_dir'] to Tk() to use it as Tk() in program.
+Filenames['participant_dir'] = Tk()
+Filenames['participant_dir'].withdraw()  # Hides small tkinter window.
+
 # Opened windows will be active. above all windows despite of selection.
 # Select the first participant data directory (PN10010002)
 path_participant = filedialog.askdirectory()  # Returns selected path as str.
 Filenames['participant_dir'] = path_participant
+
 
 # parentpath is the folder that contains all participants subfolders
 parentpath = str(Path(path_participant).parent.absolute())
@@ -101,7 +106,11 @@ def _Participant_Metrics(Filenames, Processing_filepairs):
 
         # exec(open("SIMIpy_m_metrics.py").read())
 
-        [SIMI_metrics, GS_calc, GS_PKMAS_sync, FVA_vars] = _metrics(filepath, filepath_GS, filepath_GS_sync, trial)
+        [SIMI_metrics, GS_calc,
+         GS_PKMAS_sync, FVA_vars,
+         FVA_Left_Foot, FVA_Right_Foot,
+         GS_calc, SIMIvars, current_trial] = _metrics(filepath, filepath_GS,
+                                                      filepath_GS_sync, trial)
 
         Batch_Outputs['Processing_filepairs'][trial] = filepairs
         Batch_Outputs['SIMI_metrics'][trial] = SIMI_metrics
@@ -372,7 +381,7 @@ def _Participant_Metrics(Filenames, Processing_filepairs):
     # print('Toe Off DataFrame is written successfully to Excel Sheet.')
 
     # Compile all FVA and GS HS and TO
-    # Results compiled into one dictionary that contains all participants and all trials    
+    # Results compiled into one dictionary that contains all participants and all trials
 
     z = "PN" + Filenames['participant_num']
     print(z)
@@ -404,7 +413,9 @@ def _Participant_Metrics(Filenames, Processing_filepairs):
     del z
 
     return(Participants_HS_TO, Batch_Outputs,
-           HeelStrike_SIMI, HeelStrike_GS, ToeOff_SIMI, ToeOff_GS)
+           HeelStrike_SIMI, HeelStrike_GS, ToeOff_SIMI, ToeOff_GS,
+           SIMI_metrics, GS_calc, GS_PKMAS_sync, FVA_vars,
+           FVA_Left_Foot, FVA_Right_Foot, GS_calc, SIMIvars, current_trial)
 
 # %% Run for all participants
 
@@ -467,4 +478,7 @@ for n in Participants:
 
     [Participants_HS_TO, Batch_Outputs,
      HeelStrike_SIMI, HeelStrike_GS,
-     ToeOff_SIMI, ToeOff_GS] = _Participant_Metrics(Filenames, Processing_filepairs)
+     ToeOff_SIMI, ToeOff_GS, SIMI_metrics,
+     GS_calc, GS_PKMAS_sync, FVA_vars,
+     FVA_Left_Foot, FVA_Right_Foot, GS_calc,
+     SIMIvars, current_trial] = _Participant_Metrics(Filenames, Processing_filepairs)

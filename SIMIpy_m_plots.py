@@ -56,7 +56,7 @@ _plot_GS_stride_Velocities()
 # %% Plot HMA Results
 
 
-def _plot_HMA():
+def _plot_HMA(HMA_left_foot, HMA_right_foot):
     fig, ax = plt.subplots(1, 1, figsize=(12, 7))
     ax.set_axisbelow(True)
     ax.yaxis.grid(color='0.95', linestyle='dashed')
@@ -134,12 +134,16 @@ def _plot_HMA():
     # plt.figure()
 
 
-_plot_HMA()
+_plot_HMA(HMA_left_foot, HMA_right_foot)
 
 # %% Plot results of FVA
 
 
-def _plot_FVA():
+def _plot_FVA(FVA_Left_Foot, FVA_Right_Foot, SIMIvars, SIMI_metrics, GS_calc,
+              HeelStrike_SIMI, ToeOff_SIMI,
+              HeelStrike_GS, ToeOff_GS,
+              Filenames, trial, current_trial):
+
     fig, ax = plt.subplots(1, 1, figsize=(12, 7))
     plt.show()
     ax.set_axisbelow(True)
@@ -211,7 +215,10 @@ def _plot_FVA():
     plt.tight_layout()
 
 
-_plot_FVA()
+_plot_FVA(FVA_Left_Foot, FVA_Right_Foot, SIMIvars, SIMI_metrics, GS_calc,
+          HeelStrike_SIMI, ToeOff_SIMI,
+          HeelStrike_GS, ToeOff_GS,
+          Filenames, trial, current_trial)
 
 # %% Plot results of Heel-to-Heel
 

@@ -23,7 +23,7 @@ keys = {"HeelStrike_SIMI_Normal": [],
         "ToeOff_GS_Carpet": []
         }
 
-All_Participants_HS_TO = {
+Participants_HS_TO = {
     "PN10010002": keys,
     "PN10010003": keys,
     "PN10010004": keys,
@@ -48,24 +48,24 @@ All_Participants_HS_TO = {
 
 z = "PN" + Filenames['participant_num']
 
-All_Participants_HS_TO[z]["HeelStrike_SIMI_Normal"] = HeelStrike_SIMI['Normal']
-All_Participants_HS_TO[z]["HeelStrike_SIMI_Fast"] = HeelStrike_SIMI['Fast']
-All_Participants_HS_TO[z]["HeelStrike_SIMI_Slow"] = HeelStrike_SIMI['Slow']
-All_Participants_HS_TO[z]["HeelStrike_SIMI_Carpet"] = HeelStrike_SIMI['Carpet']
+Participants_HS_TO[z]["HeelStrike_SIMI_Normal"] = HeelStrike_SIMI['Normal']
+Participants_HS_TO[z]["HeelStrike_SIMI_Fast"] = HeelStrike_SIMI['Fast']
+Participants_HS_TO[z]["HeelStrike_SIMI_Slow"] = HeelStrike_SIMI['Slow']
+Participants_HS_TO[z]["HeelStrike_SIMI_Carpet"] = HeelStrike_SIMI['Carpet']
 
-All_Participants_HS_TO[z]["ToeOff_SIMI_Normal"] = ToeOff_SIMI['Normal']
-All_Participants_HS_TO[z]["ToeOff_SIMI_Fast"] = ToeOff_SIMI['Fast']
-All_Participants_HS_TO[z]["ToeOff_SIMI_Slow"] = ToeOff_SIMI['Slow']
-All_Participants_HS_TO[z]["ToeOff_SIMI_Carpet"] = ToeOff_SIMI['Carpet']
+Participants_HS_TO[z]["ToeOff_SIMI_Normal"] = ToeOff_SIMI['Normal']
+Participants_HS_TO[z]["ToeOff_SIMI_Fast"] = ToeOff_SIMI['Fast']
+Participants_HS_TO[z]["ToeOff_SIMI_Slow"] = ToeOff_SIMI['Slow']
+Participants_HS_TO[z]["ToeOff_SIMI_Carpet"] = ToeOff_SIMI['Carpet']
 
-All_Participants_HS_TO[z]["HeelStrike_GS_Normal"] = HeelStrike_GS['Normal']
-All_Participants_HS_TO[z]["HeelStrike_GS_Fast"] = HeelStrike_GS['Fast']
-All_Participants_HS_TO[z]["HeelStrike_GS_Slow"] = HeelStrike_GS['Slow']
-All_Participants_HS_TO[z]["HeelStrike_GS_Fast"] = HeelStrike_GS['Carpet']
+Participants_HS_TO[z]["HeelStrike_GS_Normal"] = HeelStrike_GS['Normal']
+Participants_HS_TO[z]["HeelStrike_GS_Fast"] = HeelStrike_GS['Fast']
+Participants_HS_TO[z]["HeelStrike_GS_Slow"] = HeelStrike_GS['Slow']
+Participants_HS_TO[z]["HeelStrike_GS_Fast"] = HeelStrike_GS['Carpet']
 
-All_Participants_HS_TO[z]["ToeOff_GS_Normal"] = ToeOff_GS['Normal']
-All_Participants_HS_TO[z]["ToeOff_GS_Fast"] = ToeOff_GS['Fast']
-All_Participants_HS_TO[z]["ToeOff_GS_Slow"] = ToeOff_GS['Slow']
-All_Participants_HS_TO[z]["ToeOff_GS_Carpet"] = ToeOff_GS['Carpet']
+Participants_HS_TO[z]["ToeOff_GS_Normal"] = ToeOff_GS['Normal']
+Participants_HS_TO[z]["ToeOff_GS_Fast"] = ToeOff_GS['Fast']
+Participants_HS_TO[z]["ToeOff_GS_Slow"] = ToeOff_GS['Slow']
+Participants_HS_TO[z]["ToeOff_GS_Carpet"] = ToeOff_GS['Carpet']
 
 del z

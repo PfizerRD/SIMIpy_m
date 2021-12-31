@@ -60,15 +60,20 @@ def _FVA_calc(variables, signal, trial, time_mask, _ord, side):
     # HS must have TO that precedes, otherwise no HS registered
     _events = min([len(HSvals), len(TOvals)])
 
-    for n in range(0, _events-2):
+    for n in range(0, _events):
 
-        idx_TO = TOvals.index[n]
-        HSvals_remaining = HSvals[HSvals.index > idx_TO]
+        if len(HSvals) <= len(TOvals):
+            idx_test = HSvals.index[n]
+        else:
+            idx_test = TOvals.index[n]
 
-        if idx_TO < HSvals_remaining.index[-1]:
-            # Identify peak immediately following TO (should be close to zero vZ)
-            # if abs(maxvals.index[n] - maxvals.index[n])/100 <= 1.5: # HS must be within 1.5s of TO
-            df['HS'][HSvals_remaining.index[0]] = HSvals_remaining.iloc[0]
+        HSvals_remaining = HSvals[HSvals.index >= idx_test]
+
+        if len(HSvals_remaining) >= 1:
+            if idx_test <= HSvals_remaining.index[-1]:
+                # Identify peak immediately following TO (should be close to zero vZ)
+                # if abs(maxvals.index[n] - maxvals.index[n])/100 <= 1.5: # HS must be within 1.5s of TO
+                df['HS'][HSvals_remaining.index[0]] = HSvals_remaining.iloc[0]
 
     df['time'] = variables['time']
 

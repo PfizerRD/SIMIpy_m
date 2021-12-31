@@ -1,5 +1,10 @@
 from tkinter import *
 import tkinter as tk
+from SIMIpy_m_main import _Participant_Metrics
+from SIMIpy_m_metrics import _metrics
+from SIMIpy_m_filenames import _filenames
+from SIMIpy_m_processing_filepair import _filepair_chooser
+from pathlib import Path
 
 OPTIONS = [
     "Select Individual Trial",
@@ -9,56 +14,98 @@ OPTIONS = [
     "Carpet"
 ]
 
+OPTIONS_PN = [
+    "Select Participant",
+    "10010002",
+    "10010003",
+    "10010004",
+    "10010005",
+    "10010006",
+    "10010007",
+    "10010008",
+    "10010009",
+    "10010010",
+    "10010011",
+    "10010012",
+    "10010013",
+    "10010014",
+    "10010015",
+    "10010016",
+    "10010017",
+    "10010018",
+    "10010019",
+    "10010020"
+]
+
 root = Tk()
-root.geometry('400x400')
+root.geometry('275x200')
 root.configure(background='#A2B5CD')
 root.title('SIMI Trial Selector GUI')
 
 trials_dropdown = StringVar(root)
 trials_dropdown.set(OPTIONS[0])   # default value
 
+participants_dropdown = StringVar(root)
+participants_dropdown.set(OPTIONS_PN[0])   # default value
+
 filepairs = Variable(root)
 trial = StringVar(root)
 
 w = OptionMenu(root, trials_dropdown, *OPTIONS)
 w.pack()
-w.place(x=100, y=50)
+w.place(x=25, y=75)
+
+w2 = OptionMenu(root, participants_dropdown, *OPTIONS_PN)
+w2.pack()
+w2.place(x=25, y=25)
 
 
 def ok():
 
+    print("Participant Selected: " + participants_dropdown.get())
     print("Trial Selected: " + trials_dropdown.get())
-
-    if trials_dropdown.get() == 'Normal':
-        filepairs.set(Processing_filepairs[0])
-        trial.set('Normal')
-
-    elif trials_dropdown.get() == 'Fast':
-        filepairs.set(Processing_filepairs[1])
-        trial.set('Fast')
-
-    elif trials_dropdown.get() == 'Slow':
-        filepairs.set(Processing_filepairs[2])
-        trial.set('Slow')
-
-    elif trials_dropdown.get() == 'Carpet':
-        filepairs.set(Processing_filepairs[3])
-        trial.set('Carpet')
-
 
 def all_commands(): return [ok(), root.quit(), root.destroy()]
 
 
 button = Button(root, text="OK", command=all_commands)
 button.pack()
-button.place(x=100, y=200)
+button.place(x=25, y=150)
 
 
 mainloop()
 
-temp = filepairs.get()
-filepairs = temp
-del temp
+pn = participants_dropdown.get()
+Current_Participant_Path = str(Path(parentpath, pn))
+Filenames = {}
+Filenames = _filenames(Filenames, Current_Participant_Path)
+Processing_filepairs = _filepair_chooser(Filenames)
+
+
+[Participants_HS_TO, Batch_Outputs,
+ HeelStrike_SIMI, HeelStrike_GS,
+ ToeOff_SIMI, ToeOff_GS, SIMI_metrics,
+ GS_calc, GS_PKMAS_sync, FVA_vars,
+ FVA_Left_Foot, FVA_Right_Foot, GS_calc,
+ SIMIvars, current_trial] = _Participant_Metrics(Filenames, Processing_filepairs)
+
+if trials_dropdown.get() == 'Normal':
+    filepairs.set(Processing_filepairs[0])
+    trial.set('Normal')
+
+elif trials_dropdown.get() == 'Fast':
+    filepairs.set(Processing_filepairs[1])
+    trial.set('Fast')
+
+elif trials_dropdown.get() == 'Slow':
+    filepairs.set(Processing_filepairs[2])
+    trial.set('Slow')
+
+elif trials_dropdown.get() == 'Carpet':
+    filepairs.set(Processing_filepairs[3])
+    trial.set('Carpet')
+
+filepairs = filepairs.get()
 
 for n in range(0, len(filepairs)):
     index_sync = filepairs[n].find('PKMAS_Sync')
@@ -71,6 +118,14 @@ for n in range(0, len(filepairs)):
     else:
         filepath_GS = filepairs[n]
     del index_sync, index_SIMI
+
+
+[SIMI_metrics, GS_calc,
+ GS_PKMAS_sync, FVA_vars,
+ FVA_Left_Foot, FVA_Right_Foot,
+ GS_calc, SIMIvars, current_trial] = _metrics(filepath, filepath_GS,
+                                              filepath_GS_sync, trial.get())
+
 
 # Processing_filepairs .... list of all trials and associates filepairs
 # filepairs .... set of three files in same trial (SIMI, GS, and GS Sync)
