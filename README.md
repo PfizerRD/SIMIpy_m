@@ -4,8 +4,8 @@ SIMI Motion, compared to GAITRite System Metrics
     # Pre-Requisite:
         # Written to run on Spyder IDE (Anaconda3 environment), Python 3.8.
 
-    # 1) "SIMIpy_m_main.py" to process all trials for one patricipant.
-        # Required: The folder structure should contain all 4 trial types collected for that participant.
+    # 1) "SIMIpy_m_main.py" to process all trials for all patricipants.
+        # Required: The folder structure should contain all 4 trial types collected for that participant. They can be from Visit Day #1 or #2, or another say.
                 # Each trial type should contain (3) files: one .txt file for SIMI data, and two .csv files for GS data ans GS sync:
                 # filepath = r"C:\...\X9001262 - Data\10010012\X9001262_A_10010012_01_SIMIMCS1_Normal_Walk_marker_processed_7_13_2021.txt"
                 # filepath_GS = r"C:\...\X9001262 - Data\10010012\X9001262_A_10010012_01_Normal_PKMAS.csv"
