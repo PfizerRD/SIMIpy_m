@@ -26,7 +26,7 @@ def bland_altman_plot(dataGS, dataSIMI, mycolor, trial_type):
 
         z = np.polyfit(mean, diff, 1)
         p = np.poly1d(z)
-        plt.plot(mean, p(mean), "--", color=mycolor)
+        plt.plot(mean, p(mean), "-", color=mycolor)
         y_hat = np.poly1d(z)(mean)
         plt.plot(mean, y_hat, "--", lw=1, color=mycolor, label=trial_type)
         text = f"$y={z[0]:0.3f}\;mean{z[1]:+0.3f}$\n$R^2 = {r2_score(diff,y_hat):0.3f}$"
@@ -49,7 +49,8 @@ def bland_altman_plot(dataGS, dataSIMI, mycolor, trial_type):
 
 # %% Bland Altman Plots for SIMI HS (FVA) vs GS HS
 
-def _FVA_HS_Bland_Altman():
+def _FVA_HS_Bland_Altman(Participants_HS_TO,
+                         HeelStrike_SIMI, HeelStrike_GS):
     plt.figure()
 
     # position the figure:
@@ -83,12 +84,12 @@ def _FVA_HS_Bland_Altman():
     plt.show()
 
 
-_FVA_HS_Bland_Altman()
+_FVA_HS_Bland_Altman(Participants_HS_TO, HeelStrike_SIMI, HeelStrike_GS)
 
 # %% Bland Altman Plots for SIMI TO (FVA) vs GS TO
 
 
-def _FVA_TO_Bland_Altman():
+def _FVA_TO_Bland_Altman(Participants_HS_TO, ToeOff_SIMI, ToeOff_GS):
     plt.figure()
 
     # position the figure:
@@ -122,7 +123,7 @@ def _FVA_TO_Bland_Altman():
     plt.show()
 
 
-_FVA_TO_Bland_Altman()
+_FVA_TO_Bland_Altman(Participants_HS_TO, ToeOff_SIMI, ToeOff_GS)
 
 
 # %% Bland Altman Plots - Compile all Patricipant Data, then plot using:
@@ -154,27 +155,27 @@ All_HS_TO = {"HeelStrike_SIMI_Normal": [],
              "ALL_TO_GS": []
              }
 
-for n in All_Participants_HS_TO:
+for n in Participants_HS_TO:
     print(n)
-    All_HS_TO["HeelStrike_SIMI_Normal"].append(All_Participants_HS_TO[n]["HeelStrike_SIMI_Normal"])
-    All_HS_TO["HeelStrike_SIMI_Fast"].append(All_Participants_HS_TO[n]["HeelStrike_SIMI_Fast"])
-    All_HS_TO["HeelStrike_SIMI_Slow"].append(All_Participants_HS_TO[n]["HeelStrike_SIMI_Slow"])
-    All_HS_TO["HeelStrike_SIMI_Carpet"].append(All_Participants_HS_TO[n]["HeelStrike_SIMI_Carpet"])
+    All_HS_TO["HeelStrike_SIMI_Normal"].append(Participants_HS_TO[n]["HeelStrike_SIMI_Normal"])
+    All_HS_TO["HeelStrike_SIMI_Fast"].append(Participants_HS_TO[n]["HeelStrike_SIMI_Fast"])
+    All_HS_TO["HeelStrike_SIMI_Slow"].append(Participants_HS_TO[n]["HeelStrike_SIMI_Slow"])
+    All_HS_TO["HeelStrike_SIMI_Carpet"].append(Participants_HS_TO[n]["HeelStrike_SIMI_Carpet"])
 
-    All_HS_TO["ToeOff_SIMI_Normal"].append(All_Participants_HS_TO[n]["ToeOff_SIMI_Normal"])
-    All_HS_TO["ToeOff_SIMI_Fast"].append(All_Participants_HS_TO[n]["ToeOff_SIMI_Fast"])
-    All_HS_TO["ToeOff_SIMI_Slow"].append(All_Participants_HS_TO[n]["ToeOff_SIMI_Slow"])
-    All_HS_TO["ToeOff_SIMI_Carpet"].append(All_Participants_HS_TO[n]["ToeOff_SIMI_Carpet"])
+    All_HS_TO["ToeOff_SIMI_Normal"].append(Participants_HS_TO[n]["ToeOff_SIMI_Normal"])
+    All_HS_TO["ToeOff_SIMI_Fast"].append(Participants_HS_TO[n]["ToeOff_SIMI_Fast"])
+    All_HS_TO["ToeOff_SIMI_Slow"].append(Participants_HS_TO[n]["ToeOff_SIMI_Slow"])
+    All_HS_TO["ToeOff_SIMI_Carpet"].append(Participants_HS_TO[n]["ToeOff_SIMI_Carpet"])
 
-    All_HS_TO["HeelStrike_GS_Normal"].append(All_Participants_HS_TO[n]["HeelStrike_GS_Normal"])
-    All_HS_TO["HeelStrike_GS_Fast"].append(All_Participants_HS_TO[n]["HeelStrike_GS_Fast"])
-    All_HS_TO["HeelStrike_GS_Slow"].append(All_Participants_HS_TO[n]["HeelStrike_GS_Slow"])
-    All_HS_TO["HeelStrike_GS_Carpet"].append(All_Participants_HS_TO[n]["HeelStrike_GS_Carpet"])
+    All_HS_TO["HeelStrike_GS_Normal"].append(Participants_HS_TO[n]["HeelStrike_GS_Normal"])
+    All_HS_TO["HeelStrike_GS_Fast"].append(Participants_HS_TO[n]["HeelStrike_GS_Fast"])
+    All_HS_TO["HeelStrike_GS_Slow"].append(Participants_HS_TO[n]["HeelStrike_GS_Slow"])
+    All_HS_TO["HeelStrike_GS_Carpet"].append(Participants_HS_TO[n]["HeelStrike_GS_Carpet"])
 
-    All_HS_TO["ToeOff_GS_Normal"].append(All_Participants_HS_TO[n]["ToeOff_GS_Normal"])
-    All_HS_TO["ToeOff_GS_Fast"].append(All_Participants_HS_TO[n]["ToeOff_GS_Fast"])
-    All_HS_TO["ToeOff_GS_Slow"].append(All_Participants_HS_TO[n]["ToeOff_GS_Slow"])
-    All_HS_TO["ToeOff_GS_Carpet"].append(All_Participants_HS_TO[n]["ToeOff_GS_Carpet"])
+    All_HS_TO["ToeOff_GS_Normal"].append(Participants_HS_TO[n]["ToeOff_GS_Normal"])
+    All_HS_TO["ToeOff_GS_Fast"].append(Participants_HS_TO[n]["ToeOff_GS_Fast"])
+    All_HS_TO["ToeOff_GS_Slow"].append(Participants_HS_TO[n]["ToeOff_GS_Slow"])
+    All_HS_TO["ToeOff_GS_Carpet"].append(Participants_HS_TO[n]["ToeOff_GS_Carpet"])
 
 
 All_HS_TO["HeelStrike_SIMI_Normal"] = np.concatenate(All_HS_TO["HeelStrike_SIMI_Normal"])
@@ -228,16 +229,16 @@ def _FVA_ALL_Bland_Altman():
     bland_altman_plot(All_HS_TO["ALL_HS_GS"][:, 0], All_HS_TO["ALL_HS_SIMI"][:, 0], 'gray', 'All')
 
     # Normal Trial
-    bland_altman_plot(All_HS_TO["HeelStrike_SIMI_Normal"][:, 0], All_HS_TO["HeelStrike_GS_Normal"][:, 0], 'green', 'Normal Pace')
+    bland_altman_plot(All_HS_TO["HeelStrike_GS_Normal"][:, 0], All_HS_TO["HeelStrike_SIMI_Normal"][:, 0], 'green', 'Normal Pace')
 
     # Fast Trial
-    bland_altman_plot(All_HS_TO["HeelStrike_SIMI_Fast"][:, 0], All_HS_TO["HeelStrike_GS_Fast"][:, 0], 'magenta', 'Fast Pace')
+    bland_altman_plot(All_HS_TO["HeelStrike_GS_Fast"][:, 0], All_HS_TO["HeelStrike_SIMI_Fast"][:, 0], 'magenta', 'Fast Pace')
 
-    # Slow Trial
-    bland_altman_plot(All_HS_TO["HeelStrike_SIMI_Slow"][:, 0], All_HS_TO["HeelStrike_GS_Slow"][:, 0], 'blue', 'Slow Pace')
+    # # Slow Trial
+    bland_altman_plot(All_HS_TO["HeelStrike_GS_Slow"][:, 0], All_HS_TO["HeelStrike_SIMI_Slow"][:, 0], 'blue', 'Slow Pace')
 
-    # Carpeted Trial
-    bland_altman_plot(All_HS_TO["HeelStrike_SIMI_Carpet"][:, 0], All_HS_TO["HeelStrike_GS_Carpet"][:, 0], 'black', 'Carpeted')
+    # # Carpeted Trial
+    bland_altman_plot(All_HS_TO["HeelStrike_GS_Carpet"][:, 0], All_HS_TO["HeelStrike_SIMI_Carpet"][:, 0], 'black', 'Carpeted')
 
     plt.title('Bland-Altman Plot: GS HS vs SIMI HS (FVA) \n ALL Participants', size=16)
     plt.xlabel('Mean HS Time (GS + SIMI) (s)', size=16)
@@ -259,16 +260,16 @@ def _FVA_ALL_Bland_Altman():
     bland_altman_plot(All_HS_TO["ALL_TO_GS"][:, 0], All_HS_TO["ALL_TO_SIMI"][:, 0], 'gray', 'All')
 
     # Normal Trial
-    bland_altman_plot(All_HS_TO["ToeOff_SIMI_Normal"][:, 0], All_HS_TO["ToeOff_GS_Normal"][:, 0], 'green', 'Normal Pace')
+    bland_altman_plot(All_HS_TO["ToeOff_GS_Normal"][:, 0], All_HS_TO["ToeOff_SIMI_Normal"][:, 0], 'green', 'Normal Pace')
 
     # Fast Trial
-    bland_altman_plot(All_HS_TO["ToeOff_SIMI_Fast"][:, 0], All_HS_TO["ToeOff_GS_Fast"][:, 0], 'magenta', 'Fast Pace')
+    bland_altman_plot(All_HS_TO["ToeOff_GS_Fast"][:, 0], All_HS_TO["ToeOff_SIMI_Fast"][:, 0], 'magenta', 'Fast Pace')
 
-    # Slow Trial
-    bland_altman_plot(All_HS_TO["ToeOff_SIMI_Slow"][:, 0], All_HS_TO["ToeOff_GS_Slow"][:, 0], 'blue', 'Slow Pace')
+    # # Slow Trial
+    bland_altman_plot(All_HS_TO["ToeOff_GS_Slow"][:, 0], All_HS_TO["ToeOff_SIMI_Slow"][:, 0], 'blue', 'Slow Pace')
 
-    # Carpeted Trial
-    bland_altman_plot(All_HS_TO["ToeOff_SIMI_Carpet"][:, 0], All_HS_TO["ToeOff_GS_Carpet"][:, 0], 'black', 'Carpeted')
+    # # Carpeted Trial
+    bland_altman_plot(All_HS_TO["ToeOff_GS_Carpet"][:, 0], All_HS_TO["ToeOff_SIMI_Carpet"][:, 0], 'black', 'Carpeted')
 
     plt.title('Bland-Altman Plot: GS TO vs SIMI TO (FVA) \n ALL Participants', size=16)
     plt.xlabel('Mean TO Time (GS + SIMI) (s)', size=16)
