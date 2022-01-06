@@ -28,7 +28,7 @@ def bland_altman_plot(dataGS, dataSIMI, mycolor, trial_type):
         p = np.poly1d(z)
         plt.plot(mean, p(mean), "-", color=mycolor)
         y_hat = np.poly1d(z)(mean)
-        plt.plot(mean, y_hat, "--", lw=1, color=mycolor, label=trial_type)
+        plt.plot(dataSIMI, y_hat, "--", lw=1, color=mycolor, label=trial_type)
         text = f"$y={z[0]:0.3f}\;mean{z[1]:+0.3f}$\n$R^2 = {r2_score(diff,y_hat):0.3f}$"
         plt.gca().text(0.05, 0.95, text, transform=plt.gca().transAxes,
                        fontsize=14, verticalalignment='top')
@@ -41,7 +41,7 @@ def bland_altman_plot(dataGS, dataSIMI, mycolor, trial_type):
         md = np.nanmean(diff)             # Mean of the difference
         sd = np.std(diff, axis=0)         # Standard deviation of the difference
 
-        plt.scatter(mean, diff, color=mycolor, s=75, label=trial_type)
+        plt.scatter(dataSIMI, diff, color=mycolor, s=75, label=trial_type)
 
 # The corresponding elements in dataGS and dataSIMI are used to calculate the coordinates
 # for the plotted points. Then, create a plot by running the code below.
@@ -74,7 +74,7 @@ def _FVA_HS_Bland_Altman(Participants_HS_TO,
 
     plt.title('Bland-Altman Plot: GS HS vs SIMI HS (FVA) \n Participant (#%s)'
               % (Filenames['participant_num']), size=16)
-    plt.xlabel('Mean HS Time (GS + SIMI) (s)', size=16)
+    plt.xlabel('SIMI HS Time (s)', size=16)
     plt.ylabel('Difference in HS Time (GS - SIMI) (s)', size=16)
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16)
@@ -85,6 +85,15 @@ def _FVA_HS_Bland_Altman(Participants_HS_TO,
 
 
 _FVA_HS_Bland_Altman(Participants_HS_TO, HeelStrike_SIMI, HeelStrike_GS)
+
+# Save figure
+
+figname = ('Bland-Altman - HS (GS, SIMI) - PN%s'
+            % (Filenames['participant_num']))
+figname = (Filenames['participant_dir']+'/'+figname)
+plt.savefig(figname)
+
+del figname
 
 # %% Bland Altman Plots for SIMI TO (FVA) vs GS TO
 
@@ -113,7 +122,7 @@ def _FVA_TO_Bland_Altman(Participants_HS_TO, ToeOff_SIMI, ToeOff_GS):
 
     plt.title('Bland-Altman Plot: GS TO vs SIMI TO (FVA) \n Participant (#%s)'
               % (Filenames['participant_num']), size=16)
-    plt.xlabel('Mean TO Time (GS + SIMI) (s)', size=16)
+    plt.xlabel('SIMI TO Time (s)', size=16)
     plt.ylabel('Difference in TO Time (GS - SIMI) (s)', size=16)
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16)
@@ -125,6 +134,14 @@ def _FVA_TO_Bland_Altman(Participants_HS_TO, ToeOff_SIMI, ToeOff_GS):
 
 _FVA_TO_Bland_Altman(Participants_HS_TO, ToeOff_SIMI, ToeOff_GS)
 
+# Save figure
+
+figname = ('Bland-Altman - TO (GS, SIMI) - PN%s'
+            % (Filenames['participant_num']))
+figname = (Filenames['participant_dir']+'/'+figname)
+plt.savefig(figname)
+
+del figname
 
 # %% Bland Altman Plots - Compile all Patricipant Data, then plot using:
 # Polt definitions:    _FVA_HS_Bland_Altman():
@@ -241,7 +258,7 @@ def _FVA_ALL_Bland_Altman():
     bland_altman_plot(All_HS_TO["HeelStrike_GS_Carpet"][:, 0], All_HS_TO["HeelStrike_SIMI_Carpet"][:, 0], 'black', 'Carpeted')
 
     plt.title('Bland-Altman Plot: GS HS vs SIMI HS (FVA) \n ALL Participants', size=16)
-    plt.xlabel('Mean HS Time (GS + SIMI) (s)', size=16)
+    plt.xlabel('SIMI HS Time (s)', size=16)
     plt.ylabel('Difference in HS Time (GS - SIMI) (s)', size=16)
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16)
@@ -272,7 +289,7 @@ def _FVA_ALL_Bland_Altman():
     bland_altman_plot(All_HS_TO["ToeOff_GS_Carpet"][:, 0], All_HS_TO["ToeOff_SIMI_Carpet"][:, 0], 'black', 'Carpeted')
 
     plt.title('Bland-Altman Plot: GS TO vs SIMI TO (FVA) \n ALL Participants', size=16)
-    plt.xlabel('Mean TO Time (GS + SIMI) (s)', size=16)
+    plt.xlabel('SIMI TO Time (s)', size=16)
     plt.ylabel('Difference in TO Time (GS - SIMI) (s)', size=16)
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16)

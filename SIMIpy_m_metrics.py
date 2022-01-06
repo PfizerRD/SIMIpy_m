@@ -108,6 +108,8 @@ def _metrics(filepath, filepath_GS, filepath_GS_sync, trial):
         SIMIvars = {
             # time vector
             "time": df['Time'],
+            # sampling rate (calculated from time vector)
+            "sampling_rate": pandas.DataFrame(data={'rate': [round(df['Time'][1]-df['Time'][0], 2)]}),
             # position vectors
             "Heel_Left": df[['heel left X', 'heel left Y', 'heel left Z', 'Time']],
             "Heel_Right": df[['heel right X', 'heel right Y', 'heel right Z', 'Time']],
@@ -725,7 +727,7 @@ def _metrics(filepath, filepath_GS, filepath_GS_sync, trial):
 
     return(SIMI_metrics, GS_calc, GS_PKMAS_sync,
            FVA_vars, FVA_Left_Foot, FVA_Right_Foot,
-           GS_calc, SIMIvars, current_trial)
+           GS_calc, SIMIvars, SIMIvars_original, current_trial)
 
 
 # %% Saving a Figure
@@ -733,7 +735,7 @@ def _metrics(filepath, filepath_GS, filepath_GS_sync, trial):
 # # Save the figure
 # figname = ('GS_SIMI_PN%s_Trial_%s'
 #            % (Filenames['participant_num'], current_trial['GS_filename'][20:-4]))
-# figname = (Filenames['patient_dir']+'/'+figname)
+# figname = (Filenames['participant_dir']+'/'+figname)
 # plt.savefig(figname)
 
 # del figname

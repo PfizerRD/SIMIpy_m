@@ -109,8 +109,9 @@ def _Participant_Metrics(Filenames, Processing_filepairs):
         [SIMI_metrics, GS_calc,
          GS_PKMAS_sync, FVA_vars,
          FVA_Left_Foot, FVA_Right_Foot,
-         GS_calc, SIMIvars, current_trial] = _metrics(filepath, filepath_GS,
-                                                      filepath_GS_sync, trial)
+         GS_calc, SIMIvars, SIMIvars_original,
+         current_trial] = _metrics(filepath, filepath_GS,
+                                   filepath_GS_sync, trial)
 
         Batch_Outputs['Processing_filepairs'][trial] = filepairs
         Batch_Outputs['SIMI_metrics'][trial] = SIMI_metrics
@@ -209,17 +210,17 @@ def _Participant_Metrics(Filenames, Processing_filepairs):
 
     # create excel writer
 
-    # writer = pandas.ExcelWriter(Filenames['participant_num'] +
-    #                             "_FVA_and_GS_Heel_Strikes.xlsx",
-    #                             engine="xlsxwriter")
+    writer = pandas.ExcelWriter(Filenames['participant_num'] +
+                                "_FVA_and_GS_Heel_Strikes.xlsx",
+                                engine="xlsxwriter")
 
     # write dataframe to excel sheet named 'marks'
-    # df.to_excel(writer, sheet_name='Sheet1')
+    df.to_excel(writer, sheet_name='Sheet1')
 
-    # # save the excel file
-    # writer.save()
-    # writer.close()
-    # print('Heel Strikes DataFrame is written successfully to Excel Sheet.')
+    # save the excel file
+    writer.save()
+    writer.close()
+    print('Heel Strikes DataFrame is written successfully to Excel Sheet.')
 
     # EVENT METRICS SPREADSHEET (TO)
 
@@ -303,14 +304,17 @@ def _Participant_Metrics(Filenames, Processing_filepairs):
                 num = float(num)
                 num_idx = int(np.array(np.where(Y == num)))
                 num_label = str(GSvar[num_idx, 1])
-                match.append([SIMIvar[n, 0], str(SIMIvar[n, 1]), num, num_label])
+                if abs(num-SIMIvar[n, 0]) <= 0.5:
+                    # print(abs(num-SIMIvar[n, 0]))
+                    match.append([SIMIvar[n, 0], str(SIMIvar[n, 1]), num, num_label])
         elif len(Y) < len(X):
             for n in range(0, len(Y)):
                 num = min(X, key=lambda x: abs(x-Y[n]))
                 num = float(num)
                 num_idx = int(np.array(np.where(X == num)))
                 num_label = str(SIMIvar[num_idx, 1])
-                match.append([num, num_label, GSvar[n, 0], str(GSvar[n, 1])])
+                if abs(num-GSvar[n, 0]) <= 0.5:
+                    match.append([num, num_label, GSvar[n, 0], str(GSvar[n, 1])])
 
         del X, Y, SIMIvar, GSvar
 
@@ -327,6 +331,7 @@ def _Participant_Metrics(Filenames, Processing_filepairs):
         return Event_SIMI, Event_GS
 
     # Matching Toe Off Timing
+
     [ToeOff_SIMI['Normal'], ToeOff_GS['Normal']] = _matching_Event(Batch_Outputs['FVA_vals_TO']['Normal'],
                                                                    Batch_Outputs['GS_TO']['Normal'])
     [ToeOff_SIMI['Fast'], ToeOff_GS['Fast']] = _matching_Event(Batch_Outputs['FVA_vals_TO']['Fast'],
@@ -368,17 +373,17 @@ def _Participant_Metrics(Filenames, Processing_filepairs):
 
     # create excel writer
 
-    # writer = pandas.ExcelWriter(Filenames['participant_num'] +
-    #                             "_FVA_and_GS_Toe_Off.xlsx",
-    #                             engine="xlsxwriter")
+    writer = pandas.ExcelWriter(Filenames['participant_num'] +
+                                "_FVA_and_GS_Toe_Off.xlsx",
+                                engine="xlsxwriter")
 
     # write dataframe to excel sheet named 'marks'
-    # df.to_excel(writer, sheet_name='Sheet1')
+    df.to_excel(writer, sheet_name='Sheet1')
 
-    # # save the excel file
-    # writer.save()
-    # writer.close()
-    # print('Toe Off DataFrame is written successfully to Excel Sheet.')
+    # save the excel file
+    writer.save()
+    writer.close()
+    print('Toe Off DataFrame is written successfully to Excel Sheet.')
 
     # Compile all FVA and GS HS and TO
     # Results compiled into one dictionary that contains all participants and all trials
@@ -411,6 +416,9 @@ def _Participant_Metrics(Filenames, Processing_filepairs):
     Participants_HS_TO["PN" + Filenames['participant_num']]["ToeOff_GS_All"] = ToeOff_GS['All']
 
     del z
+
+    runfile('C:/Users/berkiv/OneDrive - Pfizer/Documents/GitHub/VisarPf/SIMIpy_m/_Bland_Altman_FVA.py',
+            wdir='C:/Users/berkiv/OneDrive - Pfizer/Documents/GitHub/VisarPf/SIMIpy_m', current_namespace=True)
 
     return(Participants_HS_TO, Batch_Outputs,
            HeelStrike_SIMI, HeelStrike_GS, ToeOff_SIMI, ToeOff_GS,
