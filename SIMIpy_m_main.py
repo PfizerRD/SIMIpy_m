@@ -6,8 +6,6 @@
 import pandas
 import numpy as np
 import os
-import importlib
-from scipy import signal
 from pathlib import Path
 from tkinter import Tk, filedialog
 from SIMIpy_m_processing_filepair import _filepair_chooser
@@ -24,9 +22,14 @@ Filenames = {}
 Filenames['participant_dir'] = Tk()
 Filenames['participant_dir'].withdraw()  # Hides small tkinter window.
 
+window = Tk()
+window.wm_attributes('-topmost', 1)
+window.withdraw()   # this supress the tk window
+
 # Opened windows will be active. above all windows despite of selection.
 # Select the first participant data directory (PN10010002)
-path_participant = filedialog.askdirectory()  # Returns selected path as str.
+
+path_participant = filedialog.askdirectory(title='Select the first Participant folder:', parent=window)  # Returns selected path as str.
 Filenames['participant_dir'] = path_participant
 
 
@@ -34,12 +37,7 @@ Filenames['participant_dir'] = path_participant
 parentpath = str(Path(path_participant).parent.absolute())
 # List of all participants (PN002 to PN020)
 Participants = list(range(10010002, 10010021))
-# PN 10010016 is missing processed SIMI data for Normal trial
-# Participants = list([10010002, 10010003, 10010004, 10010005,
-#                      10010006, 10010007, 10010008, 10010009,
-#                      10010010, 10010011, 10010012, 10010013,
-#                      10010014, 10010015, 10010017, 10010018,
-#                      10010019, 10010020])
+
 
 # %% _Participant_Metrics Definition
 
@@ -104,14 +102,16 @@ def _Participant_Metrics(Filenames, Processing_filepairs):
             # filepath_GS = r"C:\...\X9001262 - Data\10010012\X9001262_A_10010012_01_Normal_PKMAS.csv"
             # filepath_GS_sync = r"C:\...\X9001262 - Data\10010012\X9001262_A_10010012_01_Normal_PKMAS_sync.csv"
 
-        # exec(open("SIMIpy_m_metrics.py").read())
+        # METRICS
 
-        [SIMI_metrics, GS_calc,
+        [SIMI_metrics, GS_calc, GS_vars,
          GS_PKMAS_sync, FVA_vars,
-         FVA_Left_Foot, FVA_Right_Foot,
-         GS_calc, SIMIvars, SIMIvars_original,
+         FVA_Left_Foot, FVA_Right_Foot, HHD,
+         SIMIvars, SIMIvars_original,
          current_trial] = _metrics(filepath, filepath_GS,
                                    filepath_GS_sync, trial)
+
+        # BATCH OUTPUTS
 
         Batch_Outputs['Processing_filepairs'][trial] = filepairs
         Batch_Outputs['SIMI_metrics'][trial] = SIMI_metrics
@@ -178,10 +178,10 @@ def _Participant_Metrics(Filenames, Processing_filepairs):
 
     # EVENT METRICS SPREADSHEET (HS)
 
-    df1 = pandas.DataFrame(Batch_Outputs['FVA_vals_HS']['Normal'])
-    df2 = pandas.DataFrame(Batch_Outputs['FVA_vals_HS']['Fast'])
-    df3 = pandas.DataFrame(Batch_Outputs['FVA_vals_HS']['Slow'])
-    df4 = pandas.DataFrame(Batch_Outputs['FVA_vals_HS']['Carpet'])
+    df1 = pandas.DataFrame.reset_index(Batch_Outputs['FVA_vals_HS']['Normal'])
+    df2 = pandas.DataFrame.reset_index(Batch_Outputs['FVA_vals_HS']['Fast'])
+    df3 = pandas.DataFrame.reset_index(Batch_Outputs['FVA_vals_HS']['Slow'])
+    df4 = pandas.DataFrame.reset_index(Batch_Outputs['FVA_vals_HS']['Carpet'])
 
     df5 = pandas.DataFrame(Batch_Outputs['GS_HS']['Normal'])
     df6 = pandas.DataFrame(Batch_Outputs['GS_HS']['Fast'])
@@ -224,10 +224,10 @@ def _Participant_Metrics(Filenames, Processing_filepairs):
 
     # EVENT METRICS SPREADSHEET (TO)
 
-    df1 = pandas.DataFrame(Batch_Outputs['FVA_vals_TO']['Normal'])
-    df2 = pandas.DataFrame(Batch_Outputs['FVA_vals_TO']['Fast'])
-    df3 = pandas.DataFrame(Batch_Outputs['FVA_vals_TO']['Slow'])
-    df4 = pandas.DataFrame(Batch_Outputs['FVA_vals_TO']['Carpet'])
+    df1 = pandas.DataFrame.reset_index(Batch_Outputs['FVA_vals_TO']['Normal'])
+    df2 = pandas.DataFrame.reset_index(Batch_Outputs['FVA_vals_TO']['Fast'])
+    df3 = pandas.DataFrame.reset_index(Batch_Outputs['FVA_vals_TO']['Slow'])
+    df4 = pandas.DataFrame.reset_index(Batch_Outputs['FVA_vals_TO']['Carpet'])
 
     df5 = pandas.DataFrame(Batch_Outputs['GS_TO']['Normal'])
     df6 = pandas.DataFrame(Batch_Outputs['GS_TO']['Fast'])
@@ -417,15 +417,12 @@ def _Participant_Metrics(Filenames, Processing_filepairs):
 
     del z
 
-    runfile('C:/Users/berkiv/OneDrive - Pfizer/Documents/GitHub/VisarPf/SIMIpy_m/_Bland_Altman_FVA.py',
-            wdir='C:/Users/berkiv/OneDrive - Pfizer/Documents/GitHub/VisarPf/SIMIpy_m', current_namespace=True)
-
     return(Participants_HS_TO, Batch_Outputs,
            HeelStrike_SIMI, HeelStrike_GS, ToeOff_SIMI, ToeOff_GS,
-           SIMI_metrics, GS_calc, GS_PKMAS_sync, FVA_vars,
-           FVA_Left_Foot, FVA_Right_Foot, GS_calc, SIMIvars, current_trial)
+           SIMI_metrics, GS_calc, GS_vars, GS_PKMAS_sync, FVA_vars,
+           FVA_Left_Foot, FVA_Right_Foot, SIMIvars, current_trial)
 
-# %% Run for all participants
+    # %% Run for all participants
 
 
 for n in Participants:
@@ -487,6 +484,6 @@ for n in Participants:
     [Participants_HS_TO, Batch_Outputs,
      HeelStrike_SIMI, HeelStrike_GS,
      ToeOff_SIMI, ToeOff_GS, SIMI_metrics,
-     GS_calc, GS_PKMAS_sync, FVA_vars,
-     FVA_Left_Foot, FVA_Right_Foot, GS_calc,
+     GS_calc, GS_vars, GS_PKMAS_sync, FVA_vars,
+     FVA_Left_Foot, FVA_Right_Foot,
      SIMIvars, current_trial] = _Participant_Metrics(Filenames, Processing_filepairs)

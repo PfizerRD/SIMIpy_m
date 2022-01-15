@@ -89,8 +89,9 @@ _FVA_HS_Bland_Altman(Participants_HS_TO, HeelStrike_SIMI, HeelStrike_GS)
 # Save figure
 
 figname = ('Bland-Altman - HS (GS, SIMI) - PN%s'
-            % (Filenames['participant_num']))
-figname = (Filenames['participant_dir']+'/'+figname)
+           % (Filenames['participant_num']))
+# figname = (Filenames['participant_dir']+'/'+figname)
+figname = (parentpath+'/'+figname)
 plt.savefig(figname)
 
 del figname
@@ -137,8 +138,9 @@ _FVA_TO_Bland_Altman(Participants_HS_TO, ToeOff_SIMI, ToeOff_GS)
 # Save figure
 
 figname = ('Bland-Altman - TO (GS, SIMI) - PN%s'
-            % (Filenames['participant_num']))
-figname = (Filenames['participant_dir']+'/'+figname)
+           % (Filenames['participant_num']))
+# figname = (Filenames['participant_dir']+'/'+figname)
+figname = (parentpath+'/'+figname)
 plt.savefig(figname)
 
 del figname

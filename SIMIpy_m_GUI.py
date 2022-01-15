@@ -65,6 +65,7 @@ def ok():
     print("Participant Selected: " + participants_dropdown.get())
     print("Trial Selected: " + trials_dropdown.get())
 
+
 def all_commands(): return [ok(), root.quit(), root.destroy()]
 
 
@@ -81,13 +82,6 @@ Filenames = {}
 Filenames = _filenames(Filenames, Current_Participant_Path)
 Processing_filepairs = _filepair_chooser(Filenames)
 
-
-[Participants_HS_TO, Batch_Outputs,
- HeelStrike_SIMI, HeelStrike_GS,
- ToeOff_SIMI, ToeOff_GS, SIMI_metrics,
- GS_calc, GS_PKMAS_sync, FVA_vars,
- FVA_Left_Foot, FVA_Right_Foot, GS_calc,
- SIMIvars, current_trial] = _Participant_Metrics(Filenames, Processing_filepairs)
 
 if trials_dropdown.get() == 'Normal':
     filepairs.set(Processing_filepairs[0])
@@ -119,12 +113,20 @@ for n in range(0, len(filepairs)):
         filepath_GS = filepairs[n]
     del index_sync, index_SIMI
 
-
-[SIMI_metrics, GS_calc,
- GS_PKMAS_sync, FVA_vars,
+[Participants_HS_TO, Batch_Outputs,
+ HeelStrike_SIMI, HeelStrike_GS,
+ ToeOff_SIMI, ToeOff_GS, SIMI_metrics,
+ GS_calc, GS_vars, GS_PKMAS_sync, FVA_vars,
  FVA_Left_Foot, FVA_Right_Foot,
- GS_calc, SIMIvars, current_trial] = _metrics(filepath, filepath_GS,
-                                              filepath_GS_sync, trial.get())
+ SIMIvars, current_trial] = _Participant_Metrics(Filenames, Processing_filepairs)
+
+
+[SIMI_metrics, GS_calc, GS_vars,
+ GS_PKMAS_sync, FVA_vars,
+ FVA_Left_Foot, FVA_Right_Foot, HHD_calc,
+ SIMIvars, SIMIvars_original,
+ current_trial] = _metrics(filepath, filepath_GS,
+                           filepath_GS_sync, trial)
 
 
 # Processing_filepairs .... list of all trials and associates filepairs

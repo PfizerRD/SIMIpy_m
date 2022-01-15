@@ -40,6 +40,8 @@ def _butterworth_filter(Marker, time, format, dim):
 
 def _FVA_calc(variables, signal, trial, time_mask, _ord, side):
 
+    rate = np.double(variables['sampling_rate'])
+
     df = pandas.DataFrame(signal, columns=['data'])
     # Find local maxima and minima
     n = 5  # number of points to be checked before and after
@@ -70,10 +72,13 @@ def _FVA_calc(variables, signal, trial, time_mask, _ord, side):
         HSvals_remaining = HSvals[HSvals.index >= idx_test]
 
         if len(HSvals_remaining) >= 1:
-            if idx_test <= HSvals_remaining.index[-1]:
-                # Identify peak immediately following TO (should be close to zero vZ)
-                # if abs(maxvals.index[n] - maxvals.index[n])/100 <= 1.5: # HS must be within 1.5s of TO
-                df['HS'][HSvals_remaining.index[0]] = HSvals_remaining.iloc[0]
+            if idx_test <= HSvals_remaining.index[0]:
+                # print([HSvals_remaining.index[0], idx_test])
+                # print([HSvals_remaining.index[0] - idx_test])
+                if [HSvals_remaining.index[0] - idx_test] <= [0.5/rate]:
+                    # Identify peak immediately following TO (should be close to zero vZ)
+                    # if abs(maxvals.index[n] - maxvals.index[n])/100 <= 0.5: # HS must be within 0.5s of TO
+                    df['HS'][HSvals_remaining.index[0]] = HSvals_remaining.iloc[0]
 
     df['time'] = variables['time']
 
@@ -92,10 +97,49 @@ def _FVA_calc(variables, signal, trial, time_mask, _ord, side):
 
     return df, FVA_vars
 
+# %% Heel to Heel Distance Algorithm
+
+
+def _Heel_to_Heel(variables, t_mask, time, HHD):
+
+    def _peaks_Heel_to_Heel(signal, format, _ord):
+
+        if format == 'np':
+            df = pandas.DataFrame(signal, columns=['data'])
+            # Find local maxima and minima
+            # _ord is number of points to be checked before and after
+            # Find local peaks
+            df['min'] = df.iloc[argrelextrema(df.data.values, np.less_equal,
+                                              order=_ord, mode='clip')[0]]['data']
+            df['max'] = df.iloc[argrelextrema(df.data.values, np.greater_equal,
+                                              order=_ord, mode='clip')[0]]['data']
+            df['max'] = df['max'][df['max'] > 0.4]
+
+        return df
+
+    HHD.time = time
+    HHD.distance = abs((np.array(variables['Heel_Left'])[:, 0:3]) -
+                       np.array(variables['Heel_Right'])[:, 0:3])
+    # NOTE: for SIMIvars_original.... use: ".iloc[:, 0:3]" syntax
+    # Mask out the data where there were marker gaps originally
+    HHD.distance[~t_mask['Heel_Left_mask']] = np.nan
+    HHD.distance[~t_mask['Heel_Right_mask']] = np.nan
+
+    HHD.absolute_distance = np.linalg.norm(HHD.distance, axis=1)
+    HHD.absolute_distance[~t_mask['Heel_Left_mask']] = np.nan
+    HHD.absolute_distance[~t_mask['Heel_Right_mask']] = np.nan
+
+    # HMA HS events (peaks detection)
+    HHD.peaks_det = _peaks_Heel_to_Heel(np.array(HHD.absolute_distance), format='np', _ord=5)
+    maxvals = HHD.peaks_det['max'][~np.isnan(HHD.peaks_det['max'])]
+    HHD.peaks = maxvals
+    HHD.peaks.time = HHD.time[maxvals.index]
+
+    return HHD
 
 # %% Hreljac-Marshall Algorithm (HMA)
 
-# Dictionary Definition
+
 def _HMA_calc(heel_accel, toe_accel, time_mask_heel, HMA, h):
 
     def _peaks_HMA(signal, format, _ord):
@@ -176,27 +220,3 @@ def _HMA_calc(heel_accel, toe_accel, time_mask_heel, HMA, h):
     # HMA.jerk_z_zeros_time =  HMA.time_heel[np.where(HMA.jerk_Z == HMA.jerk_z_zeros)[0]]
 
     return HMA
-
-# %% Heel to Heel Distance Algorithm
-
-
-def _Heel_to_Heel(variables, h):
-
-    def _peaks_Heel_to_Heel(signal, format, _ord):
-
-        if format == 'np':
-            df = pandas.DataFrame(signal, columns=['data'])
-            # Find local maxima and minima
-            # _ord is number of points to be checked before and after
-            # Find local peaks
-            df['min'] = df.iloc[argrelextrema(df.data.values, np.less_equal,
-                                              order=_ord, mode='clip')[0]]['data']
-            df['max'] = df.iloc[argrelextrema(df.data.values, np.greater_equal,
-                                              order=_ord, mode='clip')[0]]['data']
-            df['max'] = df['max'][df['max'] > 5]
-
-        return df
-
-    heel_to_heel_dist = abs(np.array(variables['Heel_Left'].iloc[:, 0:3]) -
-                            np.array(variables['Heel_Right'].iloc[:, 0:3]))
-    return heel_to_heel_dist

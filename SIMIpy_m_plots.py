@@ -229,24 +229,50 @@ def _plot_HHD():
     ax.set_axisbelow(True)
     ax.yaxis.grid(color='0.95', linestyle='dashed')
     ax.xaxis.grid(color='0.95', linestyle='dashed')
+    
+    # Plot Heel to Heel Distance Algo Results
+    plt.plot(SIMIvars['time'], HHD_calc.absolute_distance, label='Heel to Heel Abs. Distance')
+    plt.scatter(HHD_calc.time, HHD_calc.peaks_det['max'], label='HHD Peaks (HS)')
+    
+    # Calculate and Annotate SIMI Stride Time
+    for n in range(1, len(HHD_calc.peaks)):       
+        Step_Time = np.array((HHD_calc.peaks.index[n]-HHD_calc.peaks.index[n-1])*SIMIvars_original['sampling_rate'])
+        Step_Time = round(float(Step_Time),2)
+        Step_Time = str(Step_Time)
+        plt.annotate('S.T.= ' + Step_Time + ' s.',
+                     (HHD_calc.time[HHD_calc.peaks.index[n]], 0.8), rotation=90)
 
-    plt.plot(SIMIvars['time'], Heel_to_Heel[:, 1], label='Heel to Heel Distance')
 
     # SIMI instantaneous velocity
-    plt.plot(SIMIvars['time'], SIMI_metrics['Spine_pos_deriv_velocity'],
-             label='SIMI, Instantaneous Velocity (Spine Marker)')
+    # plt.plot(SIMIvars['time'], SIMI_metrics['Spine_pos_deriv_velocity'],
+    #          label='SIMI, Instantaneous Velocity (Spine Marker)')
+    
+    
+    
     # GS First Contact Times, All Passes
-    plt.scatter(GS_calc['First_Contact']['Time'], [1] * len(GS_calc['First_Contact']),
+    plt.scatter(GS_calc['First_Contact']['Time'], [1.05] * len(GS_calc['First_Contact']),
                 label='GS, First Contact Time', s=75, c='gold')
-    # GC Last Contact Times, All Passes
-    plt.scatter(GS_calc['Last_Contact']['Time'], [1] * len(GS_calc['Last_Contact']),
-                label='G,S Last Contact Time', s=75, c='black')
+    # GS Last Contact Times, All Passes
+    plt.scatter(GS_calc['Last_Contact']['Time'], [1.05] * len(GS_calc['Last_Contact']),
+                label='GS, Last Contact Time', s=75, c='black')
+    # GS Absolute Step Length, All Passes
+    plt.scatter(GS_calc['Last_Contact']['Time'][1:], GS_calc['Absolute_Step_Length'][0:-1]/100,
+                label='GS Absolute Step Length', s=75, c='blue')
+    
+    # Annotate GS Stride Time
+    for n in range(0, len(GS_calc['Step_Time'])):       
+        Step_Time = np.array(GS_calc['Step_Time'][n])
+        Step_Time = round(float(Step_Time), 2)
+        Step_Time = str(Step_Time)
+        plt.annotate('GS S.T.= ' + Step_Time + ' s.',
+                     (GS_calc['Last_Contact']['Time'][n], 1.1), rotation=90)
+
 
     plt.title('HHD Algorithm, GS and SIMI Velocities \n Participant (#%s) \n Trial SIMI: (%s)'
               % (Filenames['participant_num'],
                  current_trial['SIMI_filename'][20:]), size=20)
     plt.xlabel('Time (s)', size=20)
-    plt.ylabel('Velocity (m/s)', size=20)
+    plt.ylabel('Step Length', size=20)
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16)
 

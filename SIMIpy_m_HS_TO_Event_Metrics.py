@@ -11,16 +11,6 @@ keys = {"HeelStrike_SIMI_Normal": [],
         "ToeOff_SIMI_Fast": [],
         "ToeOff_SIMI_Slow": [],
         "ToeOff_SIMI_Carpet": [],
-
-        "HeelStrike_GS_Normal": [],
-        "HeelStrike_GS_Fast": [],
-        "HeelStrike_GS_Slow": [],
-        "HeelStrike_GS_Carpet": [],
-
-        "ToeOff_GS_Normal": [],
-        "ToeOff_GS_Fast": [],
-        "ToeOff_GS_Slow": [],
-        "ToeOff_GS_Carpet": []
         }
 
 Participants_HS_TO = {

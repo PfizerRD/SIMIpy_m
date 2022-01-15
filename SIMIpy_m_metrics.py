@@ -210,9 +210,14 @@ def _metrics(filepath, filepath_GS, filepath_GS_sync, trial):
     del GS_vars['Walk Ratio (cm./(steps/min.))']
 
     GS_calc = {
-        "Step_Events": []
+        "Step_Events": [],
+        "Absolute_Step_Length": [],
+        "Step_Time": []
     }
+
     GS_calc['Step_Events'] = GS_vars.pop('Unnamed: 1')
+    GS_calc['Absolute_Step_Length'] = GS_vars.pop('Absolute Step Length (cm.)')
+    GS_calc['Step_Time'] = GS_vars.pop('Step Time (sec.)')
 
     # Drop the Nans at the beginning and end of the GS_calc['Step_Events'] array
     # careful doing this, becasue there are some NaN in the middle of some GS step data
@@ -220,16 +225,24 @@ def _metrics(filepath, filepath_GS, filepath_GS_sync, trial):
     first_idx = GS_calc['Step_Events'].first_valid_index()
     last_idx = GS_calc['Step_Events'].last_valid_index()
     GS_calc['Step_Events'] = GS_calc['Step_Events'].loc[first_idx:last_idx]
+    GS_calc['Absolute_Step_Length'] = GS_calc['Absolute_Step_Length'].loc[first_idx:last_idx]
+    GS_calc['Step_Time'] = GS_calc['Step_Time'].loc[first_idx:last_idx]
 
     del first_idx, last_idx
 
     GS_calc['Step_Events'] = np.array(GS_calc['Step_Events'])
+    GS_calc['Absolute_Step_Length'] = np.array(GS_calc['Absolute_Step_Length'])
+    GS_calc['Step_Time'] = np.array(GS_calc['Step_Time'])
 
     # There are some header and blank cells above the GS_calc['Step_Events'] rows
     # skip those rows using this skip variable that gets assigned here
     skip = int(np.where(GS_vars['Unnamed: 0'] == '1')[0])
     GS_calc['Step_Events'] = np.delete(
         GS_calc['Step_Events'], range(0, skip-1), axis=0)
+    GS_calc['Absolute_Step_Length'] = np.delete(
+        GS_calc['Absolute_Step_Length'], range(0, skip-1), axis=0)
+    GS_calc['Step_Time'] = np.delete(
+        GS_calc['Step_Time'], range(0, skip-1), axis=0)
     del skip
 
     _str = GS_calc['Step_Events']
@@ -561,7 +574,7 @@ def _metrics(filepath, filepath_GS, filepath_GS_sync, trial):
     # defining polynomial function
     var = np.poly1d([1, 0, 1])
 
-    h = 0.01  # step size (1/Fs)
+    h = np.double(SIMIvars_original['sampling_rate'])  # step size (1/Fs, AKA sampling rate)
     SIMIvars_Filtered['Midpoint_Left_Foot_v'] = np.gradient(SIMIvars_Filtered['Midpoint_Left_Foot'],
                                                             edge_order=2, axis=0)/h
 
@@ -665,9 +678,23 @@ def _metrics(filepath, filepath_GS, filepath_GS_sync, trial):
     del HMA_left, HMA_right
 
     # %% Heel to Heel Algorithm - HS, TO Detection
-
+    # h = SIMI sampling rate  (h=0.01)
     # Call definition for FVA peaks detection
-    Heel_to_Heel = _Heel_to_Heel(SIMIvars_original, h)
+
+    class _HHD_:
+        time = []
+        distance = []
+        absolute_distance = []
+        peaks_det = []
+        # arg123 = []
+        # arg123 = []
+        # arg123 = []
+
+    HHD_in = _HHD_()
+
+    HHD_calc = _Heel_to_Heel(SIMIvars_Filtered, time_vars, SIMIvars['time'], HHD_in)
+
+    del HHD_in
 
     # %% Computed Gait Metrics from SIMI Motion (Markered Data)
     # This data will be calculated to match GaitRite walkway gait metrics
@@ -725,9 +752,11 @@ def _metrics(filepath, filepath_GS, filepath_GS_sync, trial):
 
     SIMI_metrics = _SIMI_passes_velocity(SIMIvars, SIMI_metrics)
 
-    return(SIMI_metrics, GS_calc, GS_PKMAS_sync,
-           FVA_vars, FVA_Left_Foot, FVA_Right_Foot,
-           GS_calc, SIMIvars, SIMIvars_original, current_trial)
+    # %% return section
+
+    return(SIMI_metrics, GS_calc, GS_vars, GS_PKMAS_sync,
+           FVA_vars, FVA_Left_Foot, FVA_Right_Foot, HHD_calc,
+           SIMIvars, SIMIvars_original, current_trial)
 
 
 # %% Saving a Figure
